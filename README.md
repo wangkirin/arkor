@@ -6,7 +6,6 @@ Arkor is an object storage service application with high availability and high p
 
 ## Features
 
-* Compatible with [Amazon S3](http://aws.amazon.com/s3/)
 * Compatible with [Git-LFS (Git Large File Storage)](https://git-lfs.github.com/)
 * High Performance
 	* Efficient data storage server written in C language
