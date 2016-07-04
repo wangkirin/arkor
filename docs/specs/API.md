@@ -3,7 +3,7 @@
 ## Introduction
 
 
-The **Arkor HTTP APIs** is the interfaces between user and Arkor, user can easily manage objects in Arkor through standard RESTful style HTTP request. And because Arkor is compatible with Amazon S3 v4 and Git-lfs v1.3, the Arkor APIs have basically the same concepts and operations with them.
+The **Arkor HTTP APIs** is the interfaces between user and Arkor, user can easily manage objects in Arkor through standard RESTful style HTTP request. For better use, the Arkor APIs have similar concepts and operations with current Object storage service.
 
 ## Concepts
 
@@ -13,7 +13,7 @@ The fundamental entity type stored in Arkor. Objects consist of object key, obje
 
 - **Bucket**
 
-Bucket is a container for stored objects and its has a global unique name. Every object is contained in a bucket. Unlike file system, object storage is flat that all objects in bucket at the same logical level. Different from Amazon S3, Arkor did NOT implement the permission strategy like `ACL(Access Control List)` in order to simplify the operation. 
+Bucket is a container for stored objects and its has a global unique name. Every object is contained in a bucket. Unlike file system, object storage is flat that all objects in bucket at the same logical level.
 
 
 ## API List
