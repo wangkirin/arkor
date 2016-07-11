@@ -1,0 +1,7 @@
+---
+appName: Arkor
+usage: ContainerOps Object Storage Service
+version: 0.1.0
+author: Kirin Wang
+email: wangqilintech@gmail.com
+runtimePath: runtime.yaml
