@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
+
 	"github.com/containerops/arkor/cmd"
 	"github.com/containerops/arkor/utils/setting"
 )
