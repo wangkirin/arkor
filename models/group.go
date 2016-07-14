@@ -8,6 +8,6 @@ const (
 
 type Group struct {
 	ID          string       `json:"groupID,omitempty"`
-	GroupStatus int          `json:"global_Status,omitempty"`
+	GroupStatus int          `json:"globalStatus,omitempty"`
 	Servers     []DataServer `json:"servers,omitempty"`
 }
