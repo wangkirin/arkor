@@ -1,9 +1,9 @@
 package models
 
 type Error struct {
-	Type      string `json:"Type,omitempty"`
-	Code      string `json:"Code,omitempty"`
-	Message   string `json:"Message,omitempty"`
-	Resource  string `json:"Resource,omitempty"`
-	RequestID string `json:"RequestId,omitempty"`
+	Type      string `json:"type,omitempty"`
+	Code      string `json:"code,omitempty"`
+	Message   string `json:"message,omitempty"`
+	Resource  string `json:"resource,omitempty"`
+	RequestID string `json:"requestID,omitempty"`
 }

@@ -5,24 +5,25 @@ import (
 )
 
 type Bucket struct {
-	Type        string    `json:"Type,omitempty"`
-	Name        string    `json:"Name,omitempty"`
-	MaxKeys     string    `json:"MaxKeys,omitempty"`
-	IsTruncated bool      `json:"IsTruncated,omitempty"`
-	Contents    []Content `json:"Contents,omitempty"`
+	Type        string    `json:"type,omitempty"`
+	Name        string    `json:"name,omitempty"`
+	MaxKeys     string    `json:"maxKeys,omitempty"`
+	KeyCount    string    `json:"keyCount,omitempty"`
+	IsTruncated bool      `json:"isTruncated,omitempty"`
+	Contents    []Content `json:"contents,omitempty"`
 }
 
 type Content struct {
-	Key          string    `json:"Key,omitempty"`
-	LastModified time.Time `json:"LastModified,omitempty"`
-	ETag         string    `json:"ETag,omitempty"`
-	Type         string    `json:"Type,omitempty"`
-	Size         int64     `json:"Size,omitempty"`
-	StorageClass string    `json:"StorageClass,omitempty"`
-	Owner        Owner     `json:"Owner,omitempty"`
+	Key          string    `json:"key,omitempty"`
+	LastModified time.Time `json:"lastModified,omitempty"`
+	ETag         string    `json:"eTag,omitempty"`
+	Type         string    `json:"type,omitempty"`
+	Size         int64     `json:"size,omitempty"`
+	StorageClass string    `json:"storageClass,omitempty"`
+	Owner        Owner     `json:"owner,omitempty"`
 }
 
 type Owner struct {
 	ID          string `json:"ID,omitempty"`
-	DisplayName string `json:"DisplayName,omitempty"`
+	DisplayName string `json:"displayName,omitempty"`
 }

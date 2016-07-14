@@ -65,22 +65,22 @@ The body or the response also contains information about the error. The followin
 
 ```json
 {
-  "Type": "Error",
-  "Code": "NoSuchKey",
-  "Message": "The resource you requested does not exist",
-  "Resource": "/mybucket/myfoto.jpg",
-  "RequestId": "4442587FB7D0A2F9"
+  "type": "Error",
+  "code": "NoSuchKey",
+  "message": "The resource you requested does not exist",
+  "resource": "/mybucket/myfoto.jpg",
+  "requestID": "4442587FB7D0A2F9"
 }
 ```
 The following table explains the REST error response elements
 
 |Name|Description|
 |----|-----------|
-|`Type`|Type of response, here we set it as "Error"|
-|`Code`|The error code is a string that uniquely identifies an error condition|
-|`Message`|The error message contains a generic description of the error condition in English. It is intended for a human audience. |
-|`RequestId`|ID of the request associated with the error|
-|`Resource`|The bucket or object that is involved in the error.|
+|`type`|Type of response, here we set it as "Error"|
+|`code`|The error code is a string that uniquely identifies an error condition|
+|`message`|The error message contains a generic description of the error condition in English. It is intended for a human audience. |
+|`requestID`|ID of the request associated with the error|
+|`resource`|The bucket or object that is involved in the error.|
 
 ## Bucket
 
@@ -116,15 +116,15 @@ Content-Length: length
 
 ```json
 {
-  "Type": "ListAllMyBucketsResult",
-  "Owner": {
+  "type": "ListAllMyBucketsResult",
+  "owner": {
     "ID": "id",
-    "DisplayName": "arkor"
+    "displayName": "arkor"
   },
-  "Buckets": {
-    "Bucket": {
-      "Name": "quotes",
-      "CreationDate": "date"
+  "buckets": {
+    "bucket": {
+      "name": "quotes",
+      "creationDate": "date"
     }
   }
 }
@@ -134,14 +134,14 @@ Content-Length: length
 
 |Name|Description|Type|Children|Ancestor|
 |----|-----------|----|--------|--------|
-|`Type`|Type of response|-|-|None|
-|`Bucket`|Container for bucket information|Container|Name, CreationDate|Buckets|
-|`Buckets`|Container for one or more buckets|Container|Bucket|None|
-|`CreationDate`|Date the bucket was created|Date|-|Bucket|
-|`DisplayName`|Bucket owner's display name|String|-|Owner|
+|`type`|Type of response|-|-|None|
+|`bucket`|Container for bucket information|Container|Name, CreationDate|Buckets|
+|`buckets`|Container for one or more buckets|Container|Bucket|None|
+|`creationDate`|Date the bucket was created|Date|-|Bucket|
+|`displayName`|Bucket owner's display name|String|-|Owner|
 |`ID`|Bucket owner's user ID|String|-|Owner|
-|`Name`|Bucket's name|String|-|Buckets.Bucket|
-|`Owner`|Container for bucket owner information|Container|-|None|
+|`name`|Bucket's name|String|-|Buckets.Bucket|
+|`owner`|Container for bucket owner information|Container|-|None|
 
 #### Response On Failure
 
@@ -274,33 +274,34 @@ Content-Length: length
 
 ```json
 {
-  "Type": "ListBucketResult",
-  "Name": "oss-example",
-  "MaxKeys": "100",
-  "IsTruncated": "false",
-  "Contents": [
+  "type": "ListBucketResult",
+  "name": "oss-example",
+  "maxKeys": "100",
+  "keyCount": "2",
+  "isTruncated": false,
+  "contents": [
     {
-      "Key": "fun/movie/001.image",
-      "LastModified": "2012-02-24T08:43:07.000Z",
-      "ETag": "\"5B3C1A2E053D763E1B002CC607C5A0FE\"",
-      "Type": "Normal",
-      "Size": "344606",
-      "StorageClass": "Standard",
-      "Owner": {
+      "key": "fun/movie/001.image",
+      "lastModified": "2012-02-24T08:43:07.000Z",
+      "eTag": "5B3C1A2E053D763E1B002CC607C5A0FE",
+      "type": "Normal",
+      "size": "344606",
+      "storageClass": "Standard",
+      "owner": {
         "ID": "00220120222",
-        "DisplayName": "user-example"
+        "displayName": "user-example"
       }
     },
     {
-      "Key": "oss.jpg",
-      "LastModified": "2012-02-24T06:07:48.000Z",
-      "ETag": "\"5B3C1A2E053D763E1B002CC607C5A0FE\"",
-      "Type": "Normal",
-      "Size": "344606",
-      "StorageClass": "Standard",
-      "Owner": {
+      "key": "oss.jpg",
+      "lastModified": "2012-02-24T06:07:48.000Z",
+      "eTag": "5B3C1A2E053D763E1B002CC607C5A0FE",
+      "type": "Normal",
+      "size": "344606",
+      "storageClass": "Standard",
+      "owner": {
         "ID": "00220120222",
-        "DisplayName": "user-example"
+        "displayName": "user-example"
       }
     }
   ]
@@ -311,22 +312,22 @@ Content-Length: length
 
 |Name|Description|Type|Ancestor|
 |----|-----------|----|--------|
-|`Contents`|Metadata about each object returned|Container|None|
-|`CommonPrefixes`|All of the keys rolled up into a common prefix count as a single return when calculating the number of returns| String| None|
-|`Delimiter`|Causes keys that contain the same string between the prefix and the first occurrence of the delimiter to be rolled up into a single result element in the CommonPrefixes collection|Date|None|
-|`DisplayName`|Object owner's name|String|Contents.Owner|
-|`ETag`|The entity tag is an MD5 hash of the object|String|Contents|
+|`contents`|Metadata about each object returned|Container|None|
+|`commonPrefixes`|All of the keys rolled up into a common prefix count as a single return when calculating the number of returns| String| None|
+|`delimiter`|Causes keys that contain the same string between the prefix and the first occurrence of the delimiter to be rolled up into a single result element in the CommonPrefixes collection|Date|None|
+|`displayName`|Object owner's name|String|Contents.Owner|
+|`eTag`|The entity tag is an MD5 hash of the object|String|Contents|
 |`ID`|Object owner's ID|String|Contents.Owner|
-|`IsTruncated`|Specifies whether (true) or not (false) all of the results were returned|Boolean|None|
-|`Key`|The object's key|String|Contents|
-|`LastModified`|Date and time the object was last modified|Date|Contents|
-|`MaxKeys`|The maximum number of keys returned in the response body|String|None|
-|`Name`|Name of the bucket|String|None|
-|`Owner`|Bucket owner|String|Contents|
-|`Prefix`|Keys that begin with the indicated prefix|String|None|
-|`Size`|Size in bytes of the object|String|Contents|
-|`StorageClass`|STANDARD,STANDARD_IA,REDUCED_REDUNDANCY,sGLACIER|String|Contents|
-|`KeyCount`|Returns the number of keys included in the response|String|None|
+|`isTruncated`|Specifies whether (true) or not (false) all of the results were returned|Boolean|None|
+|`key`|The object's key|String|Contents|
+|`lastModified`|Date and time the object was last modified|Date|Contents|
+|`maxKeys`|The maximum number of keys returned in the response body|String|None|
+|`name`|Name of the bucket|String|None|
+|`owner`|Bucket owner|String|Contents|
+|`prefix`|Keys that begin with the indicated prefix|String|None|
+|`size`|Size in bytes of the object|String|Contents|
+|`storageClass`|STANDARD,STANDARD_IA,REDUCED_REDUNDANCY,sGLACIER|String|Contents|
+|`keyCount`|Returns the number of keys included in the response|String|None|
 
 
 #### Response On Failure
@@ -474,9 +475,9 @@ Content-Length: length
 ```
 ```json
 {
-  "Type": "CopyObjectResult",
-  "LastModified": "Fri, 24 Feb 2012 07:18:48 GMT",
-  "ETag": "\"5B3C1A2E053D763E1B002CC607C5A0FE\""
+  "type": "CopyObjectResult",
+  "lastModified": "Fri, 24 Feb 2012 07:18:48 GMT",
+  "eTag": "5B3C1A2E053D763E1B002CC607C5A0FE"
 }
 ```
 - **Parameters:**
@@ -490,8 +491,8 @@ Content-Length: length
 
 |Name|Description|Type|Ancestor|
 |----|-----------|----|--------|
-|`ETag`|Returns the ETag of the new object.|String|None|
-|`LastModified`|Returns the date the object was last modified|String|None|
+|`eTag`|Returns the ETag of the new object.|String|None|
+|`lastModified`|Returns the date the object was last modified|String|None|
 
 #### Response On Failure
 

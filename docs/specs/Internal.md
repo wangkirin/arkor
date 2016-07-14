@@ -157,7 +157,6 @@ Content-Type: application/json
   "ip": "10.1.0.6",
   "port": 7654,
   "status": 2,
-  "global_Status": 0,
   "total_free_space": 4294966273,
   "max_free_space": 2147483593,
   "pend_writes": 123,
@@ -180,7 +179,6 @@ Content-Type: application/json
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, must be one of: **INIT_STATUS(0)**, **RW_STATUS(1)**, **RO_STATUS(2)** or **ERR_STATUS(3)**|
-|`global_status`|Int|Global status of whole group, must be one of: **GLOBAL_NORMAL_STATUS(0)**, or **GLOBAL_UNNORMAL_STATUS(1)**|
 |`total_free_space`|Int64|Total free space of the data server|
 |`max_free_space`|Int64|Max remain free space of all chunks on the data server|
 |`pend_writes`|Int|Pending queue writes count|
@@ -290,40 +288,42 @@ Date: date
 Content-Type: application/json
 ```
 ```json
-[
-  {
-    "dataServerID": "as89ik",
-    "groupID": 1,
-    "ip": "10.1.0.6",
-    "port": 7654,
-    "status": 2,
-    "global_Status": 0,
-    "total_free_space": 4294966273,
-    "max_free_space": 2147483593,
-    "pend_writes": 123,
-    "data_path": "/root/ossdata",
-    "reading_count": 123,
-    "total_chunks": 2,
-    "conn_counts": 0,
-    "update_time": "2016-07-04 16:09:38"
-  },
-  {
-    "dataServerID": "zd32hg",
-    "groupID": 1,
-    "ip": "10.1.0.8",
-    "port": 7654,
-    "status": 2,
-    "global_Status": 0,
-    "total_free_space": 4294966273,
-    "max_free_space": 2147483593,
-    "pend_writes": 123,
-    "data_path": "/root/ossdata",
-    "reading_count": 123,
-    "total_chunks": 2,
-    "conn_counts": 0,
-    "update_time": "2016-07-04 16:09:38"
-  }
-]
+{
+  "id": "1",
+  "globalStatus": "0",
+  "servers": [
+    {
+      "dataServerID": "as89ik",
+      "groupID": 1,
+      "ip": "10.1.0.6",
+      "port": 7654,
+      "status": 2,
+      "total_free_space": 4294966273,
+      "max_free_space": 2147483593,
+      "pend_writes": 123,
+      "data_path": "/root/ossdata",
+      "reading_count": 123,
+      "total_chunks": 2,
+      "conn_counts": 0,
+      "update_time": "2016-07-04 16:09:38"
+    },
+    {
+      "dataServerID": "zd32hg",
+      "groupID": 1,
+      "ip": "10.1.0.8",
+      "port": 7654,
+      "status": 2,
+      "total_free_space": 4294966273,
+      "max_free_space": 2147483593,
+      "pend_writes": 123,
+      "data_path": "/root/ossdata",
+      "reading_count": 123,
+      "total_chunks": 2,
+      "conn_counts": 0,
+      "update_time": "2016-07-04 16:09:38"
+    }
+  ]
+}
 
 ```
 
@@ -331,12 +331,13 @@ Content-Type: application/json
 
 |Name|Type|Description|
 |----|----|-----------|
+|`id`|string|ID of the group|
+|`global_status`|Int|Global status of whole group, must be one of: **GROUP_STATUS_NORMAL(0)**, or **GROUP_STATUS_UNNORMAL(1)**|
 |`dataServerID`|String|The same with request|
 |`groupID`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, must be one of: **INIT_STATUS(0)**, **RW_STATUS(1)**, **RO_STATUS(2)** or **ERR_STATUS(3)**|
-|`global_status`|Int|Global status of whole group, must be one of: **GLOBAL_NORMAL_STATUS(0)**, or **GLOBAL_UNNORMAL_STATUS(1)**|
 |`total_free_space`|Int64|Total free space of the data server|
 |`max_free_space`|Int64|Max remain free space of all chunks on the data server|
 |`pend_writes`|Int|Pending queue writes count|
@@ -375,52 +376,80 @@ Content-Type: application/json
 ```json
 [
   {
-    "dataServerID": "as89ik",
-    "groupID": 1,
-    "ip": "10.1.0.6",
-    "port": 7654,
-    "status": 2,
-    "global_Status": 0,
-    "total_free_space": 4294966273,
-    "max_free_space": 2147483593,
-    "pend_writes": 123,
-    "data_path": "/root/ossdata",
-    "reading_count": 123,
-    "total_chunks": 2,
-    "conn_counts": 0,
-    "update_time": "2016-07-04 16:09:38"
+    "id": "1",
+    "globalStatus": "0",
+    "servers": [
+      {
+        "dataServerID": "as89ik",
+        "groupID": 1,
+        "ip": "10.1.0.6",
+        "port": 7654,
+        "status": 2,
+        "global_Status": 0,
+        "total_free_space": 4294966273,
+        "max_free_space": 2147483593,
+        "pend_writes": 123,
+        "data_path": "/root/ossdata",
+        "reading_count": 123,
+        "total_chunks": 2,
+        "conn_counts": 0,
+        "update_time": "2016-07-04 16:09:38"
+      },
+      {
+        "dataServerID": "zd32hg",
+        "groupID": 1,
+        "ip": "10.1.0.8",
+        "port": 7654,
+        "status": 2,
+        "global_Status": 0,
+        "total_free_space": 4294966273,
+        "max_free_space": 2147483593,
+        "pend_writes": 123,
+        "data_path": "/root/ossdata",
+        "reading_count": 123,
+        "total_chunks": 2,
+        "conn_counts": 0,
+        "update_time": "2016-07-04 16:09:38"
+      }
+    ]
   },
   {
-    "dataServerID": "zd32hg",
-    "groupID": 1,
-    "ip": "10.1.0.8",
-    "port": 7654,
-    "status": 2,
-    "global_Status": 0,
-    "total_free_space": 4294966273,
-    "max_free_space": 2147483593,
-    "pend_writes": 123,
-    "data_path": "/root/ossdata",
-    "reading_count": 123,
-    "total_chunks": 2,
-    "conn_counts": 0,
-    "update_time": "2016-07-04 16:09:38"
-  },
-  {
-    "dataServerID": "ybfc1",
-    "groupID": 2,
-    "ip": "10.1.0.8",
-    "port": 7654,
-    "status": 2,
-    "global_Status": 0,
-    "total_free_space": 4294966273,
-    "max_free_space": 2147483593,
-    "pend_writes": 123,
-    "data_path": "/root/ossdata",
-    "reading_count": 123,
-    "total_chunks": 2,
-    "conn_counts": 0,
-    "update_time": "2016-07-04 16:09:38"
+    "id": "2",
+    "globalStatus": "0",
+    "servers": [
+      {
+        "dataServerID": "asadsk",
+        "groupID": 2,
+        "ip": "10.1.0.6",
+        "port": 7654,
+        "status": 2,
+        "global_Status": 0,
+        "total_free_space": 4294966273,
+        "max_free_space": 2147483593,
+        "pend_writes": 123,
+        "data_path": "/root/ossdata",
+        "reading_count": 123,
+        "total_chunks": 2,
+        "conn_counts": 0,
+        "update_time": "2016-07-04 16:09:38"
+      },
+      {
+        "dataServerID": "12e2hg",
+        "groupID": 2,
+        "ip": "10.1.0.8",
+        "port": 7654,
+        "status": 2,
+        "global_Status": 0,
+        "total_free_space": 4294966273,
+        "max_free_space": 2147483593,
+        "pend_writes": 123,
+        "data_path": "/root/ossdata",
+        "reading_count": 123,
+        "total_chunks": 2,
+        "conn_counts": 0,
+        "update_time": "2016-07-04 16:09:38"
+      }
+    ]
   }
 ]
 
@@ -430,12 +459,13 @@ Content-Type: application/json
 
 |Name|Type|Description|
 |----|----|-----------|
+|`id`|string|ID of the group|
+|`global_status`|Int|Global status of whole group, must be one of: **GROUP_STATUS_NORMAL(0)**, or **GROUP_STATUS_UNNORMAL(1)**|
 |`dataServerID`|String|The same with request|
 |`groupID`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, must be one of: **INIT_STATUS(0)**, **RW_STATUS(1)**, **RO_STATUS(2)** or **ERR_STATUS(3)**|
-|`global_status`|Int|Global status of whole group, must be one of: **GLOBAL_NORMAL_STATUS(0)**, or **GLOBAL_UNNORMAL_STATUS(1)**|
 |`total_free_space`|Int64|Total free space of the data server|
 |`max_free_space`|Int64|Max remain free space of all chunks on the data server|
 |`pend_writes`|Int|Pending queue writes count|
