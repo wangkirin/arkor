@@ -24,8 +24,6 @@ type RunTimeConf struct {
 		ListenMode    string
 		HttpsCertFile string
 		HttpsKeyFile  string
-		Host          string
-		Port          string
 	}
 	Database struct {
 		Username string

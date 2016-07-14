@@ -11,7 +11,7 @@ import (
 
 var Log = logrus.New()
 
-func init() {
+func InitLog() {
 	// write logs to local file
 	f, err := os.OpenFile("log/arkor.log", os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
