@@ -14,9 +14,9 @@ const (
 
 // struct of DataServer
 type DataServer struct {
-	ID             string    `json:"dataServerID,omitempty"`
-	GroupID        string    `json:"groupID,omitempty"`
-	IP             string    `json:"ip,omitempty"`
+	ID             string    `json:"dataServerID,omitempty" gorm:"primary_key;column:id"`
+	GroupID        string    `json:"groupID,omitempty" gorm:"column:group_id"`
+	IP             string    `json:"ip,omitempty" gorm:"column:ip"`
 	Port           string    `json:"port,omitempty"`
 	Status         int       `json:"status,omitempty"`
 	Deleted        int       `json:"deleted,omitempty"`

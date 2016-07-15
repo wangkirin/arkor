@@ -3,7 +3,20 @@ package setting
 import (
 	"io/ioutil"
 
+	log "github.com/Sirupsen/logrus"
 	"github.com/ghodss/yaml"
+)
+
+func init() {
+	if err := initConf("conf/global.yaml", "conf/runtime.yaml"); err != nil {
+		log.Errorf("Read config error: %v", err.Error())
+		return
+	}
+}
+
+var (
+	Global  *GlobalConf
+	RunTime *RunTimeConf
 )
 
 type GlobalConf struct {
@@ -16,32 +29,46 @@ type GlobalConf struct {
 }
 
 type RunTimeConf struct {
-	Run struct {
-		RunMode string
-		LogPath string
-	}
-	Http struct {
-		ListenMode    string
-		HttpsCertFile string
-		HttpsKeyFile  string
-	}
-	Database struct {
-		Username string
-		Password string
-		Protocol string
-		Host     string
-		Port     string
-		Schema   string
-		Param    map[string]string
-	}
+	Run         *Run
+	Http        *Http
+	Sqldatabase *Sqldatabase
+	Kvdatabase  *Kvdatabase
 }
 
-var (
-	Global  *GlobalConf
-	RunTime *RunTimeConf
-)
+type Run struct {
+	RunMode string
+	LogPath string
+}
 
-func InitConf(globalFilePath string, runtimeFilePath string) error {
+type Sqldatabase struct {
+	Driver   string
+	Username string
+	Password string
+	Protocol string
+	Host     string
+	Port     string
+	Schema   string
+	Param    map[string]string
+}
+
+type Kvdatabase struct {
+	Driver   string
+	Username string
+	Password string
+	Protocol string
+	Host     string
+	Port     string
+	Schema   string
+	Param    map[string]string
+}
+
+type Http struct {
+	ListenMode    string
+	HttpsCertFile string
+	HttpsKeyFile  string
+}
+
+func initConf(globalFilePath string, runtimeFilePath string) error {
 
 	globalFile, err := ioutil.ReadFile(globalFilePath)
 	if err != nil {

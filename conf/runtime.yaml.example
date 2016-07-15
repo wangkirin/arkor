@@ -6,15 +6,19 @@ http:
   listenMode: http
   httpsCertFile: cert/containerops/containerops.crt
   httpsKeyFile: cert/containerops/containerops.key
-  host: 0.0.0.0
-  port: 8990
-database:
+sqldatabase:
+  driver: mysql
   username: root
   password: wang
   protocol: tcp
-  host: 10.229.40.140
+  host: 127.0.0.1
   port: 3306
-  schema: 
-  param:
-    charset: utf8
-    parseTime: True
+  schema: arkor
+kvdatabase:
+  driver: redis
+  username: root
+  password: containerops
+  protocol: tcp
+  host: 127.0.0.1
+  port: 6379
+  partition: 8
