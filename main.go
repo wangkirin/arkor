@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/codegangsta/cli"
@@ -11,11 +10,6 @@ import (
 )
 
 func main() {
-	if err := setting.InitConf("conf/global.yaml", "conf/runtime.yaml"); err != nil {
-		fmt.Printf("Read config error: %v", err.Error())
-		return
-	}
-
 	app := cli.NewApp()
 
 	app.Name = setting.Global.AppName
