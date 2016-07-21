@@ -14,10 +14,10 @@ const (
 
 // struct of DataServer
 type DataServer struct {
-	ID             string    `json:"dataServerID,omitempty" gorm:"primary_key;column:id"`
+	ID             string    `json:"dataServerID,omitempty" gorm:"unique;column:id"`
 	GroupID        string    `json:"groupID,omitempty" gorm:"column:group_id"`
 	IP             string    `json:"ip,omitempty" gorm:"column:ip"`
-	Port           string    `json:"port,omitempty"`
+	Port           int       `json:"port,omitempty"`
 	Status         int       `json:"status,omitempty"`
 	Deleted        int       `json:"deleted,omitempty"`
 	TotalChunks    int       `json:"total_chunks,omitempty"`
