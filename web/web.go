@@ -22,13 +22,13 @@ func SetArkorMacaron(m *macaron.Macaron) {
 		m.Use(macaron.Static("external"))
 	}
 	// Init SQL DB
-	InitSQLDB(&models.DataServer{})
+	InitSQLDB()
 	// Init Key/Value DB
-	InitKVDB(&models.DataServer{})
+	InitKVDB()
 
 }
 
-func InitSQLDB(models ...interface{}) {
+func InitSQLDB() {
 	if err := db.SelectSQLDriver(RunTime.Sqldatabase.Driver); err != nil {
 		fmt.Printf("Register database driver error: %s\n", err.Error())
 	} else {
@@ -37,19 +37,19 @@ func InitSQLDB(models ...interface{}) {
 		if err != nil {
 			fmt.Printf("Connect database error: %s\n", err.Error())
 		}
-		db.SQLDB.RegisterModel(models)
+		db.SQLDB.RegisterModel(&models.DataServer{})
 	}
 }
 
-func InitKVDB(models ...interface{}) {
-	if err := db.SelectSQLDriver(RunTime.Kvdatabase.Driver); err != nil {
+func InitKVDB() {
+	if err := db.SelectKVDriver(RunTime.Kvdatabase.Driver); err != nil {
 		fmt.Printf("Register database driver error: %s\n", err.Error())
 	} else {
 		DBuri := fmt.Sprintf("%s:%s", RunTime.Kvdatabase.Host, RunTime.Kvdatabase.Port)
-		err := db.SQLDB.InitDB(RunTime.Kvdatabase.Driver, RunTime.Kvdatabase.Username, RunTime.Kvdatabase.Password, DBuri, RunTime.Kvdatabase.Schema, 0)
+		err := db.KVDB.InitDB(RunTime.Kvdatabase.Driver, RunTime.Kvdatabase.Username, RunTime.Kvdatabase.Password, DBuri, RunTime.Kvdatabase.Schema, 8)
 		if err != nil {
 			fmt.Printf("Connect database error: %s\n", err.Error())
 		}
-		db.SQLDB.RegisterModel(models)
+		db.KVDB.RegisterModel(&models.DataServer{})
 	}
 }
