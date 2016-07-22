@@ -48,18 +48,17 @@ type Sqldatabase struct {
 	Host     string
 	Port     string
 	Schema   string
-	Param    map[string]string
 }
 
 type Kvdatabase struct {
-	Driver   string
-	Username string
-	Password string
-	Protocol string
-	Host     string
-	Port     string
-	Schema   string
-	Param    map[string]string
+	Driver    string
+	Username  string
+	Password  string
+	Protocol  string
+	Host      string
+	Port      string
+	Schema    string
+	Partition int64
 }
 
 type Http struct {

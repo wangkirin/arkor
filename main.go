@@ -6,7 +6,7 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/containerops/arkor/cmd"
-	"github.com/containerops/arkor/utils/setting"
+	"github.com/containerops/arkor/setting"
 )
 
 func main() {

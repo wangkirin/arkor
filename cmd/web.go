@@ -8,7 +8,7 @@ import (
 	"github.com/codegangsta/cli"
 	"gopkg.in/macaron.v1"
 
-	"github.com/containerops/arkor/utils/setting"
+	"github.com/containerops/arkor/setting"
 	"github.com/containerops/arkor/web"
 )
 

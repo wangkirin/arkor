@@ -3,7 +3,7 @@ package middleware
 import (
 	"gopkg.in/macaron.v1"
 
-	"github.com/containerops/arkor/utils/setting"
+	"github.com/containerops/arkor/setting"
 )
 
 func SetMiddlewares(m *macaron.Macaron) {

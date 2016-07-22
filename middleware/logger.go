@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/Sirupsen/logrus"
@@ -12,15 +10,17 @@ import (
 var Log = logrus.New()
 
 func InitLog() {
-	// write logs to local file
-	f, err := os.OpenFile("log/arkor.log", os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		fmt.Errorf("Init logger middleware FAIL: %s", err.Error())
-	}
-	logrus.SetOutput(f)
+	// save log content to file, Not enable yet
 
-	// set Output format
-	logrus.SetFormatter(&logrus.JSONFormatter{})
+	// // write logs to local file
+	// f, err := os.OpenFile("log/arkor.log", os.O_WRONLY|os.O_CREATE, 0755)
+	// if err != nil {
+	// 	fmt.Errorf("Init logger middleware FAIL: %s", err.Error())
+	// }
+	// logrus.SetOutput(f)
+
+	// // set Output format
+	// logrus.SetFormatter(&logrus.JSONFormatter{})
 }
 
 func logger(runmode string) macaron.Handler {
