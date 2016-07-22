@@ -8,8 +8,8 @@ import (
 	"github.com/containerops/arkor/middleware"
 	"github.com/containerops/arkor/models"
 	"github.com/containerops/arkor/router"
+	. "github.com/containerops/arkor/setting"
 	"github.com/containerops/arkor/utils/db"
-	. "github.com/containerops/arkor/utils/setting"
 )
 
 func SetArkorMacaron(m *macaron.Macaron) {
@@ -46,7 +46,7 @@ func InitKVDB() {
 		fmt.Printf("Register database driver error: %s\n", err.Error())
 	} else {
 		DBuri := fmt.Sprintf("%s:%s", RunTime.Kvdatabase.Host, RunTime.Kvdatabase.Port)
-		err := db.KVDB.InitDB(RunTime.Kvdatabase.Driver, RunTime.Kvdatabase.Username, RunTime.Kvdatabase.Password, DBuri, RunTime.Kvdatabase.Schema, 8)
+		err := db.KVDB.InitDB(RunTime.Kvdatabase.Driver, RunTime.Kvdatabase.Username, RunTime.Kvdatabase.Password, DBuri, RunTime.Kvdatabase.Schema, RunTime.Kvdatabase.Partition)
 		if err != nil {
 			fmt.Printf("Connect database error: %s\n", err.Error())
 		}
