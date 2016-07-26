@@ -10,6 +10,7 @@ import (
 )
 
 func SetRouters(m *macaron.Macaron) {
+	m.Get("/", handler.GetServiceHandler)
 	// internal APIS
 	m.Group("/internal", func() {
 		m.Group("/v1", func() {

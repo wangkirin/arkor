@@ -10,6 +10,7 @@ type DriverFactory interface {
 	Create(obj interface{}) error
 	Delete(obj interface{}) error
 	Query(obj interface{}) (bool, error)
+	QueryMulti(condition interface{}, value interface{}) (bool, error)
 	Save(obj interface{}) error
 }
 

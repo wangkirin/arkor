@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
@@ -19,6 +20,11 @@ func init() {
 }
 
 var db *gorm.DB
+
+// Singleton
+func MySQLInstance() *gorm.DB {
+	return db
+}
 
 func (my *mysql) InitDB(driver, user, passwd, uri, name string, partition int64) error {
 	var err error
@@ -38,14 +44,23 @@ func (my *mysql) InitDB(driver, user, passwd, uri, name string, partition int64)
 }
 
 func (my *mysql) RegisterModel(datastructs ...interface{}) error {
+	// Create table and Sync the data struct
 	for _, datastruct := range datastructs {
 		if !db.HasTable(datastruct) {
 			if result := db.CreateTable(datastruct); result.Error != nil {
-				log.Infoln("Create Table Error")
+				log.Infof("Create Table: %v Error", reflect.TypeOf(datastruct).String())
 				return result.Error
 			}
 		}
 		db.AutoMigrate(datastruct)
+	}
+	// Set up the associations
+	for _, datastruct := range datastructs {
+		v := reflect.ValueOf(datastruct)
+		m := v.MethodByName("Associate")
+		if m.IsValid() {
+			m.Call([]reflect.Value{})
+		}
 	}
 	return nil
 }
@@ -82,6 +97,16 @@ func (my *mysql) Query(value interface{}) (bool, error) {
 		return false, result.Error
 	} else if result.RowsAffected > 1 {
 		return true, fmt.Errorf("query records more than one")
+	}
+	return true, nil
+}
+
+// Query Multi record
+func (my *mysql) QueryMulti(condition interface{}, value interface{}) (bool, error) {
+	if result := db.Where(condition).Find(value); result.Error != nil && strings.EqualFold(result.Error.Error(), "record not found") {
+		return false, nil
+	} else if result.Error != nil {
+		return false, result.Error
 	}
 	return true, nil
 }

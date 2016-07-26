@@ -95,6 +95,10 @@ func (r *redisdrv) Query(obj interface{}) (bool, error) {
 	return true, nil
 }
 
+func (r *redisdrv) QueryMulti(condition interface{}, value interface{}) (bool, error) {
+	return true, nil
+}
+
 func getKey(obj interface{}) (result string) {
 	objectType := reflect.TypeOf(obj).Elem().Name()
 	s := reflect.ValueOf(obj).Elem()
