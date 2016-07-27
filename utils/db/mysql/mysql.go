@@ -10,6 +10,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 
+	"github.com/containerops/arkor/setting"
 	"github.com/containerops/arkor/utils/db/factory"
 )
 
@@ -39,6 +40,9 @@ func (my *mysql) InitDB(driver, user, passwd, uri, name string, partition int64)
 		db.DB().SetMaxIdleConns(10)
 		db.DB().SetMaxOpenConns(100)
 		db.SingularTable(true)
+		if setting.RunTime.Run.RunMode == "dev" {
+			db = db.Debug()
+		}
 	}
 	return err
 }

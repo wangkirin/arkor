@@ -8,23 +8,23 @@ import (
 )
 
 type Bucket struct {
-	Name         string    `json:"name,omitempty"`
-	MaxKeys      string    `json:"maxKeys,omitempty"`
-	KeyCount     string    `json:"keyCount,omitempty"`
-	IsTruncated  bool      `json:"isTruncated,omitempty"`
+	Name         string    `json:"name,omitempty" gorm:"unique"`
+	MaxKeys      string    `json:"maxKeys,omitempty" gorm:"-"`
+	KeyCount     string    `json:"keyCount,omitempty" gorm:"-"`
+	IsTruncated  bool      `json:"isTruncated,omitempty" gorm:"-"`
 	CreationDate time.Time `json:"creationDate,omitempty"`
 	Contents     []Content `json:"contents,omitempty" gorm:"ForeignKey:Key;AssociationForeignKey:Name"`
 	Owner        Owner     `json:"-" gorm:"ForeignKey:ID;AssociationForeignKey:Name"`
 }
 
 type Content struct {
-	Key          string    `json:"key,omitempty"`
-	LastModified time.Time `json:"lastModified,omitempty"`
-	ETag         string    `json:"eTag,omitempty"`
-	Type         string    `json:"type,omitempty"`
-	Size         int64     `json:"size,omitempty"`
-	StorageClass string    `json:"storageClass,omitempty"`
-	Owner        Owner     `json:"owner,omitempty" gorm:"ForeignKey:ID;AssociationForeignKey:Key"`
+	Key          string    `json:"key"`
+	LastModified time.Time `json:"lastModified"`
+	ETag         string    `json:"eTag"`
+	Type         string    `json:"type"`
+	Size         int64     `json:"size"`
+	StorageClass string    `json:"storageClass"`
+	Owner        Owner     `json:"owner" gorm:"ForeignKey:ID;AssociationForeignKey:Key"`
 }
 
 type BucketListResponse struct {
