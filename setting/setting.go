@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	if err := initConf("conf/global.yaml", "conf/runtime.yaml"); err != nil {
+	if err := InitConf("conf/global.yaml", "conf/runtime.yaml"); err != nil {
 		log.Errorf("Read config error: %v", err.Error())
 		return
 	}
@@ -67,7 +67,7 @@ type Http struct {
 	HttpsKeyFile  string
 }
 
-func initConf(globalFilePath string, runtimeFilePath string) error {
+func InitConf(globalFilePath string, runtimeFilePath string) error {
 
 	globalFile, err := ioutil.ReadFile(globalFilePath)
 	if err != nil {
