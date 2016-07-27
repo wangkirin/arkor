@@ -10,7 +10,13 @@ import (
 )
 
 func SetRouters(m *macaron.Macaron) {
-	m.Get("/", handler.GetServiceHandler)
+	m.Group("/v1", func() {
+		m.Get("/", handler.GetServiceHandler)
+		m.Put("/:bucket", handler.PutBucketHandler)
+		m.Head("/:bucket", handler.HeadBucketHandler)
+		m.Delete("/:bucket", handler.DeleteBucketHandler)
+		m.Get("/:bucket", handler.GetBucketHandler)
+	})
 	// internal APIS
 	m.Group("/internal", func() {
 		m.Group("/v1", func() {
