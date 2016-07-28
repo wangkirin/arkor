@@ -105,7 +105,7 @@ func GetBucketHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 
 	// Preload Associations and Query
 	mysqldb := mysql.MySQLInstance()
-	mysqldb.Preload("Contents").Find(&bucket)
+	mysqldb.Preload("Contents").Preload("Contents.Owner").Preload("Owner").Find(&bucket)
 
 	// Output
 	result, err := json.Marshal(bucket)

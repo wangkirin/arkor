@@ -13,18 +13,19 @@ type Bucket struct {
 	KeyCount     string    `json:"keyCount,omitempty" gorm:"-"`
 	IsTruncated  bool      `json:"isTruncated,omitempty" gorm:"-"`
 	CreationDate time.Time `json:"creationDate,omitempty"`
-	Contents     []Content `json:"contents,omitempty" gorm:"ForeignKey:Key;AssociationForeignKey:Name"`
-	Owner        Owner     `json:"-" gorm:"ForeignKey:ID;AssociationForeignKey:Name"`
+	Contents     []Content `json:"contents,omitempty" gorm:"ForeignKey:BucketName;AssociationForeignKey:Name"`
+	Owner        Owner     `json:"-" gorm:"ForeignKey:BucketName;AssociationForeignKey:Name"`
 }
 
 type Content struct {
+	BucketName   string    `json:"-"`
 	Key          string    `json:"key"`
 	LastModified time.Time `json:"lastModified"`
 	ETag         string    `json:"eTag"`
 	Type         string    `json:"type"`
 	Size         int64     `json:"size"`
 	StorageClass string    `json:"storageClass"`
-	Owner        Owner     `json:"owner" gorm:"ForeignKey:ID;AssociationForeignKey:Key"`
+	Owner        Owner     `json:"owner" gorm:"ForeignKey:ContentKey;AssociationForeignKey:Key"`
 }
 
 type BucketListResponse struct {
@@ -44,5 +45,6 @@ func (b *Bucket) Associate() {
 	var owner Owner
 	mysqldb := mysql.MySQLInstance()
 	mysqldb.Model(&bucket).Related(&content, "Contents")
+	mysqldb.Model(&bucket).Related(&owner, "Owner")
 	mysqldb.Model(&content).Related(&owner, "Owner")
 }
