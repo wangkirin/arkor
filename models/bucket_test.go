@@ -44,22 +44,24 @@ func Test_BucketCreate(t *testing.T) {
 		DisplayName: "containerops-arkor",
 	}
 	ct1 := Content{
-		Key:   "jpeg1",
-		ETag:  "abcdefg",
-		Type:  "pic",
-		Owner: owner,
+		Key:          "jpeg1",
+		ETag:         "abcdefg",
+		Type:         "pic",
+		LastModified: time.Now(),
+		Owner:        owner,
 	}
 
 	ct2 := Content{
-		Key:   "jpeg2",
-		ETag:  "abcdefg",
-		Type:  "video",
-		Owner: owner,
+		Key:          "jpeg2",
+		ETag:         "abcdefg",
+		LastModified: time.Now(),
+		Type:         "video",
+		Owner:        owner,
 	}
 
 	contents := []Content{ct1, ct2}
 	buckettest := &Bucket{
-		Name:         "bucket2",
+		Name:         "bucket7",
 		CreationDate: time.Now(),
 		Contents:     contents,
 		Owner:        owner,

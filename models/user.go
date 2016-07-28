@@ -8,6 +8,8 @@ package models
 // )
 
 type Owner struct {
-	ID          string `json:"ID,omitempty"`
+	BucketName  string `json:"-"`
+	ContentKey  string `json:"-"`
+	ID          string `json:"ID,omitempty" gorm:"column:ID"`
 	DisplayName string `json:"displayName,omitempty"`
 }
