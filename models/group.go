@@ -11,3 +11,9 @@ type Group struct {
 	GroupStatus int          `json:"globalStatus,omitempty"`
 	Servers     []DataServer `json:"servers,omitempty"`
 }
+
+type GroupServer struct {
+	ID       int    `json:"id,omitempty" gorm:"primary_key:true;AUTO_INCREMENT"`
+	GroupID  string `json:"groupID,omitempty"`
+	ServerID string `json:"serverID,omitempty"`
+}
