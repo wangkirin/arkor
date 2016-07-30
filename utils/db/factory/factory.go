@@ -12,6 +12,7 @@ type DriverFactory interface {
 	Query(obj interface{}) (bool, error)
 	QueryMulti(condition interface{}, value interface{}) (bool, error)
 	Save(obj interface{}) error
+	GetDB() interface{}
 }
 
 var SQLDrivers = make(map[string]DriverFactory)

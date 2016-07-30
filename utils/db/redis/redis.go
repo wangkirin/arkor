@@ -114,3 +114,8 @@ func getKey(obj interface{}) (result string) {
 	result = fmt.Sprintf("%s-%s", strings.ToLower(objectType), keys[0])
 	return result
 }
+
+/* Currently the redis driver does not provide a db reference */
+func (r *redisdrv) GetDB() interface{} {
+	return nil
+}

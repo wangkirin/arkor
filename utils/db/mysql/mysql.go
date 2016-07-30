@@ -114,3 +114,8 @@ func (my *mysql) QueryMulti(condition interface{}, value interface{}) (bool, err
 	}
 	return true, nil
 }
+
+// Return the db for some furture operations
+func (my *mysql) GetDB() interface{} {
+	return db
+}
