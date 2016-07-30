@@ -377,15 +377,15 @@ Content-Type: application/json
 [
   {
     "id": "1",
-    "groupStatus": "0",
+    "group_status": "0",
     "servers": [
       {
-        "dataServerID": "as89ik",
-        "groupID": 1,
+        "data_server_id": "as89ik",
+        "group_id": 1,
         "ip": "10.1.0.6",
         "port": 7654,
         "status": 2,
-        "global_Status": 0,
+        "group_status": 0,
         "total_free_space": 4294966273,
         "max_free_space": 2147483593,
         "pend_writes": 123,
@@ -396,12 +396,12 @@ Content-Type: application/json
         "update_time": "2016-07-04 16:09:38"
       },
       {
-        "dataServerID": "zd32hg",
-        "groupID": 1,
+        "data_server_id": "zd32hg",
+        "group_id": 1,
         "ip": "10.1.0.8",
         "port": 7654,
         "status": 2,
-        "global_Status": 0,
+        "global_status": 0,
         "total_free_space": 4294966273,
         "max_free_space": 2147483593,
         "pend_writes": 123,
@@ -415,15 +415,15 @@ Content-Type: application/json
   },
   {
     "id": "2",
-    "groupStatus": "0",
+    "group_status": "0",
     "servers": [
       {
-        "dataServerID": "asadsk",
-        "groupID": 2,
+        "data_server_id": "asadsk",
+        "group_id": 2,
         "ip": "10.1.0.6",
         "port": 7654,
         "status": 2,
-        "global_Status": 0,
+        "global_status": 0,
         "total_free_space": 4294966273,
         "max_free_space": 2147483593,
         "pend_writes": 123,
@@ -434,12 +434,12 @@ Content-Type: application/json
         "update_time": "2016-07-04 16:09:38"
       },
       {
-        "dataServerID": "12e2hg",
-        "groupID": 2,
+        "data_server_id": "12e2hg",
+        "group_id": 2,
         "ip": "10.1.0.8",
         "port": 7654,
         "status": 2,
-        "global_Status": 0,
+        "global_status": 0,
         "total_free_space": 4294966273,
         "max_free_space": 2147483593,
         "pend_writes": 123,
