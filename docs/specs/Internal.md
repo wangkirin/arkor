@@ -31,12 +31,12 @@ Content-Type: application/json
 ```json
 [
   {
-    "groupID": 1,
+    "group_id": 1,
     "ip": "10.1.0.6",
     "port": 7654
   },
   {
-    "groupID": 2,
+    "group_id": 2,
     "ip": "10.1.0.8",
     "port": 7664
   }
