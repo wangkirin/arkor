@@ -80,7 +80,15 @@ func AddDataserverHandler(ctx *macaron.Context, req models.DataServer, log *logr
 		return http.StatusInsufficientStorage, []byte(err.Error())
 	}
 
-	return http.StatusOK, nil
+	dsObj := make(map[string]interface{})
+	dsObj["ip"] = ds.IP
+	dsObj["port"] = ds.Port
+	dsObj["group_id"] = ds.GroupID
+
+	ctx.Resp.Header().Set("Content-Type", "application/json")
+	result, _ := json.Marshal([]interface{}{dsObj})
+
+	return http.StatusOK, result
 }
 
 func GetGroupsHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
