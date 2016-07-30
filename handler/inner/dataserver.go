@@ -11,6 +11,7 @@ import (
 	"github.com/containerops/arkor/models"
 	"github.com/containerops/arkor/utils"
 	"github.com/containerops/arkor/utils/db"
+	"github.com/jinzhu/gorm"
 )
 
 func PutDataserverHandler(ctx *macaron.Context, req models.DataServer, log *logrus.Logger) (int, []byte) {
@@ -83,30 +84,57 @@ func AddDataserverHandler(ctx *macaron.Context, req models.DataServer, log *logr
 }
 
 func GetGroupsHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
-
-	relations := []models.GroupServer{}
-
-	if _, err := db.SQLDB.QueryMulti(&models.GroupServer{}, &relations); err != nil {
-		log.Println(err.Error())
-		return http.StatusInternalServerError, []byte(err.Error())
-	}
-
-	groups := make(map[string][]string)
-
-	for _, relation := range relations {
-		if _, exists := groups[relation.GroupID]; exists == true {
-			groups[relation.GroupID] = append(groups[relation.GroupID], relation.ServerID)
-		} else {
-			groups[relation.GroupID] = []string{relation.ServerID}
-		}
-	}
-
-	result, err := json.Marshal(groups)
+	dbInstance := db.SQLDB.GetDB().(*gorm.DB)
+	rows, err := dbInstance.Raw("SELECT * FROM data_server, group_server WHERE data_server.id=group_server.server_id").Rows()
 	if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
+	groupMap := make(map[string]interface{})
+
+	for rows.Next() {
+		var gsInfo models.GroupServerInfo
+		dbInstance.ScanRows(rows, &gsInfo)
+
+		server := make(map[string]interface{})
+		server["data_server_id"] = gsInfo.ServerID
+		server["ip"] = gsInfo.IP
+		server["port"] = gsInfo.Port
+		server["status"] = gsInfo.Status
+		server["group_status"] = gsInfo.GroupStatus
+		server["total_chunks"] = gsInfo.TotalChunks
+		server["total_free_space"] = gsInfo.TotalFreeSpace
+		server["max_free_space"] = gsInfo.MaxFreeSpace
+		server["pending_writes"] = gsInfo.PendingWrites
+		server["data_path"] = gsInfo.DataPath
+		server["reading_count"] = gsInfo.ReadingCount
+		server["conn_counts"] = gsInfo.ConnCounts
+		server["create_time"] = gsInfo.CreateTime
+		server["update_time"] = gsInfo.UpdateTime
+		server["group_id"] = gsInfo.GroupID
+
+		if _, exists := groupMap[gsInfo.GroupID]; exists == true {
+			group := groupMap[gsInfo.GroupID].(map[string]interface{})
+			servers := group["servers"].([]interface{})
+			servers = append(servers, server)
+			group["servers"] = servers
+		} else {
+			g := make(map[string]interface{})
+			g["id"] = gsInfo.GroupID
+			g["group_status"] = gsInfo.GroupStatus
+			g["servers"] = []interface{}{server}
+			groupMap[gsInfo.GroupID] = g
+		}
+	}
+
+	groups := []interface{}{}
+
+	for _, group := range groupMap {
+		groups = append(groups, group)
+	}
+
 	ctx.Resp.Header().Set("Content-Type", "application/json")
+	result, _ := json.Marshal(groups)
 
 	return http.StatusOK, result
 }
