@@ -290,7 +290,7 @@ Content-Type: application/json
 ```json
 {
   "id": "1",
-  "globalStatus": "0",
+  "groupStatus": "0",
   "servers": [
     {
       "dataServerID": "as89ik",
@@ -377,7 +377,7 @@ Content-Type: application/json
 [
   {
     "id": "1",
-    "globalStatus": "0",
+    "groupStatus": "0",
     "servers": [
       {
         "dataServerID": "as89ik",
@@ -415,7 +415,7 @@ Content-Type: application/json
   },
   {
     "id": "2",
-    "globalStatus": "0",
+    "groupStatus": "0",
     "servers": [
       {
         "dataServerID": "asadsk",
