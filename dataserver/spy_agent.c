@@ -19,24 +19,24 @@
 
 char *master_report_uri = "/internal/v1/dataserver";
 
-char *http_text = "POST %s HTTP/1.1\r\n"
+char *http_text = "PUT %s HTTP/1.1\r\n"
 	"Host: %s:%d\r\n"
 	"Content-Type: text/json\r\n"
 	"Content-Length: %d\r\n\r\n"
 	"%s";
 
-char *json_data = "{\"GroupId\": %d,"
-	"\"Ip\":\"%s\","
-	"\"Port\":%d,"
-    "\"Status\": %d,"
-	"\"TotalFreeSpace\":%"PRIu64","
-	"\"MaxFreeSpace\":%"PRIu64","
-    "\"PendingWrites\": %d,"
-	"\"WritingCount\": %d,"
-	"\"ReadingCount\": %d,"
-    "\"DataDir\": \"%s\","
-    "\"TotalChunks\":%d,"
-     "\"ConnectionsCount\":%d}";
+char *json_data = "{\"groupID\": %d,"
+	"\"ip\":\"%s\","
+	"\"port\":%d,"
+    "\"status\": %d,"
+	"\"total_free_space\":%"PRIu64","
+	"\"max_free_space\":%"PRIu64","
+    "\"pend_writes\": %d,"
+	"\"writing_count\": %d,"
+	"\"reading_count\": %d,"
+    "\"data_path\": \"%s\","
+    "\"total_chunks\":%d,"
+     "\"conn_counts\":%d}";
 
 static int spy_write(int fd, char *buf, int count)
 {
@@ -140,7 +140,7 @@ void *spy_report_routine(void *arg)
 					 config.data_dir,
 					 report_info.n_chunks,
 					 report_info.conn_count);
-
+		
 		assert(n < 2048);
 
 		spy_atomic_set(&report_info.lock, 0);
