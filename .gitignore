@@ -24,4 +24,6 @@ _testmain.go
 *.prof
 
 arkor
+dataserver/spy_server
 conf/runtime.yaml
+conf/dataserver.yaml

@@ -20,6 +20,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		cmd.CmdWeb,
+		cmd.CmdDataServer,
 	}
 
 	app.Flags = append(app.Flags, []cli.Flag{}...)

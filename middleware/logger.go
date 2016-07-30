@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"runtime"
+	"strings"
 
 	"github.com/Sirupsen/logrus"
 	"gopkg.in/macaron.v1"
@@ -24,13 +25,18 @@ func InitLog() {
 }
 
 func logger(runmode string) macaron.Handler {
-	return func(ctx *macaron.Context) {
-		Log.WithFields(logrus.Fields{
-			"[Method]":        ctx.Req.Method,
-			"[RequestHeader]": ctx.Req.Header,
-			"[Path]":          ctx.Req.RequestURI,
-		}).Info("Request Received")
+	if strings.EqualFold(runmode, "dev") {
+		return func(ctx *macaron.Context) {
+			body, _ := ctx.Req.Body().String()
+			Log.WithFields(logrus.Fields{
+				"[Method]":        ctx.Req.Method,
+				"[RequestHeader]": ctx.Req.Header,
+				"[Path]":          ctx.Req.RequestURI,
+				"[Body]":          body,
+			}).Info("Request Received")
+		}
 	}
+	return nil
 }
 
 // DecorateRuntimeContext appends line, file and function context to the logger
