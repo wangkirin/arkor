@@ -23,7 +23,7 @@ func PutDataserverHandler(ctx *macaron.Context, req models.DataServer, log *logr
 
 	// Query DataServer ID from SQL Database
 	if exist, err := db.SQLDB.Query(ds); !exist && err == nil {
-		return http.StatusNotFound, []byte("Data server have NOT registered")
+		return http.StatusNotFound, []byte("Data server is NOT registered")
 	} else if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
@@ -123,11 +123,11 @@ func DeleteDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []b
 	}
 
 	if err := db.KVDB.Delete(ds); err != nil {
-		return http.StatusInternalServerError, nil
+		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
 	if err := db.SQLDB.Delete(ds); err != nil {
-		return http.StatusInternalServerError, nil
+		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
 	return http.StatusOK, nil
@@ -148,9 +148,9 @@ func GetDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 
 	// If there is no info in cache, try to fetch it from SQLDB and rebuild the cache
 	if exist, err := db.SQLDB.Query(ds); !exist && err == nil {
-		return http.StatusNotFound, []byte("Data server NOT found")
+		return http.StatusNotFound, []byte("Data server is NOT registered")
 	} else if err != nil {
-		return http.StatusInternalServerError, nil
+		return http.StatusInternalServerError, []byte(err.Error())
 	}
 	db.KVDB.Create(ds)
 
