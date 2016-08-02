@@ -290,7 +290,7 @@ Content-Type: application/json
 ```json
 {
   "id": "1",
-  "groupStatus": "0",
+  "group_status": "0",
   "servers": [
     {
       "data_server_id": "as89ik",
