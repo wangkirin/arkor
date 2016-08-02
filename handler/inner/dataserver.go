@@ -51,6 +51,10 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 	dataServers := []models.DataServer{}
 	json.Unmarshal(data, &dataServers)
 
+	if len(dataServers) == 0 {
+		return http.StatusBadRequest, []byte("Invalid Parameters or Incorrect json content")
+	}
+
 	insertDataServerSql := "INSERT INTO data_server (id, group_id, ip, port, create_time, update_time) VALUES "
 	insertGroupServerSql := "INSERT INTO group_server (group_id, server_id) VALUES "
 
@@ -89,7 +93,7 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 		dsObj["group_id"] = dataServer.GroupID
 		dsObj["data_server_id"] = serverID
 
-		resultAry = append(ary, dsObj)
+		resultAry = append(resultAry, dsObj)
 	}
 
 	dbInstance := db.SQLDB.GetDB().(*gorm.DB)
