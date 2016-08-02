@@ -116,6 +116,49 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 	return http.StatusOK, result
 }
 
+func DeleteDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
+	dataserverID := ctx.Params(":dataserver")
+	ds := &models.DataServer{
+		ID: dataserverID,
+	}
+
+	if err := db.KVDB.Delete(ds); err != nil {
+		return http.StatusInternalServerError, nil
+	}
+
+	if err := db.SQLDB.Delete(ds); err != nil {
+		return http.StatusInternalServerError, nil
+	}
+
+	return http.StatusOK, nil
+}
+
+func GetDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
+	dataserverID := ctx.Params(":dataserver")
+	ds := &models.DataServer{
+		ID: dataserverID,
+	}
+
+	exist, err := db.KVDB.Query(ds)
+	if exist && err == nil { // Got the server from cache
+		result, _ := json.Marshal(ds)
+		ctx.Resp.Header().Set("Content-Type", "application/json")
+		return http.StatusOK, result
+	}
+
+	// If there is no info in cache, try to fetch it from SQLDB and rebuild the cache
+	if exist, err := db.SQLDB.Query(ds); !exist && err == nil {
+		return http.StatusNotFound, []byte("Data server NOT found")
+	} else if err != nil {
+		return http.StatusInternalServerError, nil
+	}
+	db.KVDB.Create(ds)
+
+	ctx.Resp.Header().Set("Content-Type", "application/json")
+	result, _ := json.Marshal(ds)
+	return http.StatusOK, result
+}
+
 func GetGroupsHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	dbInstance := db.SQLDB.GetDB().(*gorm.DB)
 	rows, err := dbInstance.Raw("SELECT * FROM data_server, group_server WHERE data_server.id=group_server.server_id").Rows()
