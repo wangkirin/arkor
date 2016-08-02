@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 	"reflect"
 	"regexp"
@@ -107,6 +108,14 @@ func MD5(key string) string {
 	h.Write([]byte(md5String))
 
 	return hex.EncodeToString(h.Sum(nil))
+}
+
+/*
+Get a unique ID by passing a random string into MD5
+*/
+func MD5ID() string {
+	s := fmt.Sprintf("%d", rand.Int31())
+	return MD5(s)
 }
 
 func Compare(a, b string) int {
