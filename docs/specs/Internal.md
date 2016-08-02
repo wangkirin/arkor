@@ -121,7 +121,7 @@ Date: date
 #### Response On Failure
 
 * 400 - Bad Request (Invalid Parameters)
-* 404 - Not Found (Data server have NOT registered)
+* 404 - Not Found (Data server is NOT registered)
 * 409 - Conflict (Data Server already deleted)
 * 500 - Internal Server Error
 
@@ -194,7 +194,7 @@ Content-Type: application/json
 #### Response On Failure
 
 * 400 - Bad Request (Invalid Parameters)
-* 404 - Not Found (Data server have NOT registered)
+* 404 - Not Found (Data server is NOT registered)
 * 409 - Conflict (Data Server already deleted)
 * 500 - Internal Server Error
 
@@ -255,7 +255,7 @@ Date: date
 #### Response On Failure
 
 * 400 - Bad Request (Invalid Parameters)
-* 404 - Not Found (Data server have NOT registered)
+* 404 - Not Found (Data server is NOT registered)
 * 409 - Conflict (Data Server already deleted)
 * 500 - Internal Server Error
 
