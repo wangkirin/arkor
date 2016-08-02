@@ -10,6 +10,6 @@ package models
 type Owner struct {
 	BucketName  string `json:"-"`
 	ContentKey  string `json:"-"`
-	ID          string `json:"ID,omitempty" gorm:"column:ID"`
-	DisplayName string `json:"displayName,omitempty"`
+	ID          string `json:"id,omitempty" gorm:"column:ID"`
+	DisplayName string `json:"display_name,omitempty"`
 }

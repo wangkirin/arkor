@@ -3,50 +3,62 @@ package modules
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"math/rand"
 	"net/http"
-	"strconv"
-	"time"
 
-	"github.com/Sirupsen/logrus"
-	"gopkg.in/macaron.v1"
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/containerops/arkor/models"
 	"github.com/containerops/arkor/setting"
-	"github.com/containerops/arkor/utils/db"
-	"github.com/containerops/arkor/utils/db/mysql"
+	// "github.com/containerops/arkor/utils/db"
+	// "github.com/containerops/arkor/utils/db/mysql"
 )
 
-func GetDataGroups() ([]models.Group, err) {
+func GetDataGroups() ([]models.Group, error) {
 	var DataGroups []models.Group
 	// Get DataGroups Information from
-	rcURI := fmt.Sprintf("http://%s:%s/internal/v1/groups", setting.ObjectServer.RegistrationCenter.Address, setting.ObjectServer.RegistrationCenter.Port)
+	rcURI := fmt.Sprintf("http://%s:%s/internal/v1/groups", setting.ObjectServerConf.RegistrationCenter.Address, setting.ObjectServerConf.RegistrationCenter.Port)
 	resp, err := http.Get(rcURI)
 	if err != nil {
+		log.Errorln(err.Error())
 		return nil, err
 	}
-	err := json.Unmarshal(resp, &DataGroups)
+	result, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		log.Errorln(err.Error())
+		return nil, err
+	}
+	err = json.Unmarshal(result, &DataGroups)
 	if err != nil {
 		return nil, err
 	}
 	return DataGroups, nil
 }
 
-func SelectDataGroup(groups models.Group, size int64) (models.Group, error) {
+func SelectDataGroup(groups []models.Group, size int64) (*models.Group, error) {
+	// Check if all servers in the Group have enought free space
+	indexlist := []int{}
 	for index, dg := range groups {
 		var find bool = true
-		for _, server := range groups.Servers {
+		if dg.GroupStatus != models.GROUP_STATUS_NORMAL {
+			find = false
+		}
+		for _, server := range dg.Servers {
 			if server.MaxFreeSpace < size {
 				find = false
 				break
 			}
 		}
 		if find {
-			resultGroupId = groupId
+			indexlist = append(indexlist, index)
 		}
 	}
-
-	if resultGroupId != "" {
-		return groups.GroupMap[resultGroupId], nil
+	// Select a available group and return
+	if len(indexlist) == 0 {
+		return nil, fmt.Errorf("Can not find an available Data Server Group")
 	}
-	return nil, fmt.Errorf("can not find an available chunkserver")
+	randindex := rand.Int() % len(indexlist)
+	return &groups[indexlist[randindex]], nil
 }

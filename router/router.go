@@ -20,7 +20,10 @@ func SetRouters(m *macaron.Macaron) {
 	// internal APIS
 	m.Group("/internal", func() {
 		m.Group("/v1", func() {
+			m.Post("/dataserver" /*binding.Bind(models.DataServer{}),*/, inner.AddDataserverHandler)
 			m.Put("/dataserver", binding.Bind(models.DataServer{}), inner.PutDataserverHandler)
+			m.Get("/groups", inner.GetGroupsHandler)
+			m.Get("/object/id", inner.AllocateFileID)
 		})
 	})
 	// interface to test whether the arkor is working
