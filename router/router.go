@@ -25,6 +25,7 @@ func SetRouters(m *macaron.Macaron) {
 			m.Get("/:dataserver", inner.GetDataserverHandler)
 			m.Put("/dataserver", binding.Bind(models.DataServer{}), inner.PutDataserverHandler)
 			m.Get("/groups", inner.GetGroupsHandler)
+			m.Get("/groups/:group", inner.GetGroupHandler)
 			m.Get("/object/id", inner.AllocateFileID)
 		})
 	})
