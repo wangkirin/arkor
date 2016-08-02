@@ -165,6 +165,7 @@ func GetGroupsHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
+	defer rows.Close()
 
 	groupMap := make(map[string]interface{})
 
