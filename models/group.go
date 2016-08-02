@@ -9,16 +9,16 @@ const (
 )
 
 type Group struct {
-	ID          string       `json:"groupID,omitempty"`
-	GroupStatus int          `json:"groupStatus,omitempty"`
+	ID          string       `json:"group_id,omitempty"`
+	GroupStatus int          `json:"group_status,omitempty"`
 	Servers     []DataServer `json:"servers,omitempty"`
 }
 
 type GroupServer struct {
 	ID          int    `json:"id,omitempty" gorm:"primary_key:true;AUTO_INCREMENT"`
-	GroupStatus int    `json:"groupStatus,omitempty"`
-	GroupID     string `json:"groupID,omitempty"`
-	ServerID    string `json:"serverID,omitempty"`
+	GroupStatus int    `json:"group_status,omitempty"`
+	GroupID     string `json:"group_id,omitempty"`
+	ServerID    string `json:"server_id,omitempty"`
 }
 
 /*

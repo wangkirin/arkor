@@ -9,10 +9,10 @@ import (
 
 type Bucket struct {
 	Name         string    `json:"name,omitempty" gorm:"unique"`
-	MaxKeys      string    `json:"maxKeys,omitempty" gorm:"-"`
-	KeyCount     string    `json:"keyCount,omitempty" gorm:"-"`
-	IsTruncated  bool      `json:"isTruncated,omitempty" gorm:"-"`
-	CreationDate time.Time `json:"creationDate,omitempty"`
+	MaxKeys      string    `json:"max_keys,omitempty" gorm:"-"`
+	KeyCount     string    `json:"key_count,omitempty" gorm:"-"`
+	IsTruncated  bool      `json:"is_truncated,omitempty" gorm:"-"`
+	CreationDate time.Time `json:"creation_date,omitempty"`
 	Contents     []Content `json:"contents,omitempty" gorm:"ForeignKey:BucketName;AssociationForeignKey:Name"`
 	Owner        Owner     `json:"-" gorm:"ForeignKey:BucketName;AssociationForeignKey:Name"`
 }
@@ -20,11 +20,11 @@ type Bucket struct {
 type Content struct {
 	BucketName   string    `json:"-"`
 	Key          string    `json:"key"`
-	LastModified time.Time `json:"lastModified"`
+	LastModified time.Time `json:"last_modified"`
 	ETag         string    `json:"eTag"`
 	Type         string    `json:"type"`
 	Size         int64     `json:"size"`
-	StorageClass string    `json:"storageClass"`
+	StorageClass string    `json:"storage_class"`
 	Owner        Owner     `json:"owner" gorm:"ForeignKey:ContentKey;AssociationForeignKey:Key"`
 }
 
@@ -36,7 +36,7 @@ type BucketListResponse struct {
 
 type BucketSimple struct {
 	Name         string    `json:"name,omitempty"`
-	CreationDate time.Time `json:"creationDate,omitempty"`
+	CreationDate time.Time `json:"creation_date,omitempty"`
 }
 
 func (b *Bucket) Associate() {
