@@ -2,6 +2,7 @@ package inner
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -45,49 +46,69 @@ func PutDataserverHandler(ctx *macaron.Context, req models.DataServer, log *logr
 	return http.StatusOK, nil
 }
 
-func AddDataserverHandler(ctx *macaron.Context, req models.DataServer, log *logrus.Logger) (int, []byte) {
-	now := time.Now()
-	ServerID := utils.MD5ID()
+func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
+	data, _ := ctx.Req.Body().Bytes()
+	dataServers := []models.DataServer{}
+	json.Unmarshal(data, &dataServers)
 
-	ds := &models.DataServer{
-		ID:         ServerID,
-		GroupID:    req.GroupID,
-		IP:         req.IP,
-		Port:       req.Port,
-		CreateTime: now,
-		UpdateTime: now,
+	insertDataServerSql := "INSERT INTO data_server (id, group_id, ip, port, create_time, update_time) VALUES "
+	insertGroupServerSql := "INSERT INTO group_server (group_id, server_id) VALUES "
+
+	resultAry := []interface{}{}
+	for _, dataServer := range dataServers {
+
+		now := time.Now()
+		nowStr := now.Format("2006-01-02 15:04:05") // I don't know what the writer of Go is thinking of!
+		serverID := utils.MD5ID()
+
+		insertDataServer := fmt.Sprintf("(%q, %q, %q, %d, %q, %q),", serverID, dataServer.GroupID, dataServer.IP, dataServer.Port, nowStr, nowStr)
+		insertGroupServer := fmt.Sprintf("(%q, %q),", dataServer.GroupID, serverID)
+
+		insertDataServerSql += insertDataServer
+		insertGroupServerSql += insertGroupServer
+
+		ds := &models.DataServer{
+			ID:         serverID,
+			GroupID:    dataServer.GroupID,
+			IP:         dataServer.IP,
+			Port:       dataServer.Port,
+			CreateTime: now,
+			UpdateTime: now,
+		}
+
+		log.Println(ds)
+		// Save dataserver info to K/V Database as cache
+		if err := db.KVDB.Create(ds); err != nil {
+			log.Println(err.Error())
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
+
+		dsObj := make(map[string]interface{})
+		dsObj["ip"] = dataServer.IP
+		dsObj["port"] = dataServer.Port
+		dsObj["group_id"] = dataServer.GroupID
+		dsObj["data_server_id"] = serverID
+
+		resultAry = append(ary, dsObj)
 	}
 
-	// Create dataserver in SQL Database
-	if err := db.SQLDB.Create(ds); err != nil {
-		log.Println(err.Error())
-		return http.StatusInternalServerError, []byte(err.Error())
+	dbInstance := db.SQLDB.GetDB().(*gorm.DB)
+	// Remove the last ','
+	insertDataServerSql = insertDataServerSql[:len(insertDataServerSql)-1]
+	insertGroupServerSql = insertGroupServerSql[:len(insertGroupServerSql)-1]
+
+	if result := dbInstance.Exec(insertDataServerSql); result.Error != nil {
+		log.Println(result.Error)
+		return http.StatusInternalServerError, []byte(result.Error.Error())
 	}
 
-	log.Println(ds)
-	// Save dataserver info to K/V Database as cache
-	if err := db.KVDB.Create(ds); err != nil {
-		log.Println(err.Error())
-		return http.StatusInternalServerError, []byte(err.Error())
+	if result := dbInstance.Exec(insertGroupServerSql); result.Error != nil {
+		log.Println(result.Error)
+		return http.StatusInternalServerError, []byte(result.Error.Error())
 	}
-
-	gs := &models.GroupServer{
-		GroupID:  req.GroupID,
-		ServerID: ServerID,
-	}
-
-	if err := db.SQLDB.Create(gs); err != nil {
-		return http.StatusInsufficientStorage, []byte(err.Error())
-	}
-
-	dsObj := make(map[string]interface{})
-	dsObj["ip"] = ds.IP
-	dsObj["port"] = ds.Port
-	dsObj["group_id"] = ds.GroupID
 
 	ctx.Resp.Header().Set("Content-Type", "application/json")
-	result, _ := json.Marshal([]interface{}{dsObj})
-
+	result, _ := json.Marshal(resultAry)
 	return http.StatusOK, result
 }
 
