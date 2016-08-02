@@ -114,9 +114,7 @@ func MD5(key string) string {
 Get a unique ID by passing a random string into MD5
 */
 func MD5ID() string {
-	src := rand.NewSource(time.Now().UnixNano())
-	r := rand.New(src)
-	s := fmt.Sprintf("%d", r.Int63())
+	s := fmt.Sprintf("%d", rand.Int31())
 	return MD5(s)
 }
 
