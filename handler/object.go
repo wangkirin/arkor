@@ -3,8 +3,6 @@ package handler
 import (
 	// "encoding/json"
 	// "fmt"
-	"crypto/md5"
-	"encoding/hex"
 	"net/http"
 	"strconv"
 	"time"
@@ -14,7 +12,6 @@ import (
 
 	"github.com/containerops/arkor/models"
 	"github.com/containerops/arkor/modules"
-	"github.com/containerops/arkor/modules/pools"
 	// "github.com/containerops/arkor/utils/db"
 	// "github.com/containerops/arkor/utils/db/mysql"
 )
@@ -39,42 +36,101 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	fragSize := FRAGEMENT_SIZE_MB * 1024 * 1024
 	fragCount := int64(objectLength / int64(fragSize))
 	partial := int64(objectLength % int64(fragSize))
+	fragements := []models.Fragment{}
 
-	// The object contains only one fragment
+	// The object divided into one fragment
 	if fragCount == 0 && partial != 0 {
 		content, err := ctx.Req.Body().Bytes()
 		if err != nil {
 			log.Errorf("[Upload Object Error] Can't NOT Get Object Content")
 			return http.StatusBadRequest, []byte("Can't NOT Get Object Content")
 		}
-		datagroups, err := modules.GetDataGroups()
-		if err != nil {
-			return http.StatusInternalServerError, []byte(err.Error())
-		}
-		datagroup, err := modules.SelectDataGroup(datagroups, partial)
-		if err != nil {
-			return http.StatusInternalServerError, []byte(err.Error())
-		}
-		if err := pools.SyncDataServerConnectionPools(datagroups); err != nil {
-			return http.StatusInternalServerError, []byte(err.Error())
-		}
-		// Generate fileID
-		h := md5.New()
-		h.Write(content)
-		fileID := hex.EncodeToString(h.Sum(nil))
 		// Set up fragmentInfo Metaesrver
 		fragmentInfo := models.Fragment{
-			Index:   1,
-			Start:   0,
-			End:     partial,
-			FileID:  fileID,
-			GroupID: datagroup.ID,
-			IsLast:  true,
+			Index:  0,
+			Start:  0,
+			End:    partial,
+			IsLast: true,
 		}
-		if err := modules.Upload(content, datagroup, &fragmentInfo); err != nil {
+		if err := modules.Upload(content, &fragmentInfo); err != nil {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
 		fragmentInfo.ModTime = time.Now()
+		fragements = append(fragements, fragmentInfo)
+	}
+
+	// The object divided into more than one fragment and have partial left
+	if fragCount != 0 && partial != 0 {
+		// Read and Upload all fragments
+		for k := 0; k < int(fragCount); k++ {
+			fragmentInfo := models.Fragment{
+				Index:  k,
+				Start:  int64(k * fragSize),
+				End:    int64((k + 1) * fragSize),
+				IsLast: false,
+			}
+			buf := make([]byte, fragSize)
+			n, err := ctx.Req.Request.Body.Read(buf)
+			if err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
+			if n != fragSize {
+				return http.StatusInternalServerError, []byte("Read Body Error")
+			}
+			if err := modules.Upload(buf, &fragmentInfo); err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
+			fragements = append(fragements, fragmentInfo)
+		}
+		// Read and Upload partial data
+		fragmentInfo := models.Fragment{
+			Index:  int(fragCount + 1),
+			Start:  (fragCount + 1) * int64(fragSize),
+			End:    (fragCount+1)*int64(fragSize) + partial,
+			IsLast: true,
+		}
+		buf := make([]byte, partial)
+		n, err := ctx.Req.Request.Body.Read(buf)
+		if err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
+		if n != fragSize {
+			return http.StatusInternalServerError, []byte("Read Body Error")
+		}
+		if err := modules.Upload(buf, &fragmentInfo); err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
+		fragements = append(fragements, fragmentInfo)
+	}
+
+	// The object divided into more than one fragment and have no partial left
+	if fragCount != 0 && partial == 0 {
+		// Read and Upload all fragments
+		for k := 0; k < int(fragCount); k++ {
+			fragmentInfo := models.Fragment{
+				Index: k,
+				Start: int64(k * fragSize),
+				End:   int64((k + 1) * fragSize),
+			}
+			if k != int(fragCount-1) {
+				fragmentInfo.IsLast = false
+			} else {
+				fragmentInfo.IsLast = true
+			}
+
+			buf := make([]byte, fragSize)
+			n, err := ctx.Req.Request.Body.Read(buf)
+			if err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
+			if n != fragSize {
+				return http.StatusInternalServerError, []byte("Read Body Error")
+			}
+			if err := modules.Upload(buf, &fragmentInfo); err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
+			fragements = append(fragements, fragmentInfo)
+		}
 	}
 
 	// Return the upload result

@@ -2,7 +2,9 @@ package modules
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"io"
 
@@ -24,7 +26,33 @@ var (
 	PING   uint8 = 0x0A
 )
 
-func Upload(data []byte, datagroup *models.Group, fragInfo *models.Fragment) error {
+func Upload(data []byte, fragInfo *models.Fragment) error {
+	datagroups, err := GetDataGroups()
+	if err != nil {
+		return err
+	}
+	datagroup, err := SelectDataGroup(datagroups, fragInfo.End-fragInfo.Start)
+	if err != nil {
+		return err
+	}
+	if err := pools.SyncDataServerConnectionPools(datagroups); err != nil {
+		return err
+	}
+	// Generate fileID
+	h := md5.New()
+	h.Write(data)
+	fileID := hex.EncodeToString(h.Sum(nil))
+
+	fragInfo.FileID = fileID
+	fragInfo.GroupID = datagroup.ID
+
+	if err := UploadData(data, datagroup, fragInfo); err != nil {
+		return err
+	}
+	return nil
+}
+
+func UploadData(data []byte, datagroup *models.Group, fragInfo *models.Fragment) error {
 	// Count the number of normal servers
 	normalCount := 0
 	for _, server := range datagroup.Servers {
