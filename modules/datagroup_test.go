@@ -5,10 +5,26 @@ import (
 	"testing"
 
 	"github.com/containerops/arkor/models"
+	. "github.com/containerops/arkor/setting"
 )
 
-func Test_SelectDataGroup(t *testing.T) {
+func init() {
+	if err := InitConf("../conf/global.yaml", "../conf/runtime.yaml"); err != nil {
+		fmt.Errorf("Read config error: %v", err.Error())
+		return
+	}
+}
 
+func Test_GetDataGroup(t *testing.T) {
+	groups, err := GetDataGroups()
+	if err != nil {
+		fmt.Println(err.Error())
+		t.Fatalf(err.Error())
+	}
+	fmt.Println(groups)
+}
+
+func Test_SelectDataGroup(t *testing.T) {
 	server1 := models.DataServer{
 		ID:           "testServer1",
 		GroupID:      "1",
@@ -52,7 +68,7 @@ func Test_SelectDataGroup(t *testing.T) {
 		IP:           "10.229.40.120",
 		Port:         7457,
 		Status:       models.RW_STATUS,
-		MaxFreeSpace: 20,
+		MaxFreeSpace: 1222200,
 	}
 	server6 := models.DataServer{
 		ID:           "testServer6",

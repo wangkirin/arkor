@@ -17,7 +17,12 @@ import (
 
 func GetDataGroups() ([]models.Group, error) {
 	var DataGroups []models.Group
-	// Get DataGroups Information from
+	// Read object server configs
+	if err := setting.InitObjectServerConf("../conf/objectserver.yaml"); err != nil {
+		log.Errorf("Read config error: %v", err.Error())
+		return nil, err
+	}
+	// Get DataGroups Information from Registration Center
 	rcURI := fmt.Sprintf("http://%s:%s/internal/v1/groups", setting.ObjectServerConf.RegistrationCenter.Address, setting.ObjectServerConf.RegistrationCenter.Port)
 	resp, err := http.Get(rcURI)
 	if err != nil {
