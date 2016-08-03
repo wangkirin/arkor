@@ -25,7 +25,7 @@ char *http_text = "PUT %s HTTP/1.1\r\n"
 	"Content-Length: %d\r\n\r\n"
 	"%s";
 
-char *json_data = "{\"groupID\": %d,"
+char *json_data = "{\"group_id\":\"%d\","
 	"\"ip\":\"%s\","
 	"\"port\":%d,"
     "\"status\": %d,"
