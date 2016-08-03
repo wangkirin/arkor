@@ -130,6 +130,12 @@ func DeleteDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []b
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
 
+	whereClause := fmt.Sprintf("server_id=%q", dataserverID)
+
+	if result := db.SQLDB.GetDB().(*gorm.DB).Where(whereClause).Delete(models.GroupServer{}); result.Error != nil {
+		return http.StatusInternalServerError, []byte(result.Error.Error())
+	}
+
 	return http.StatusOK, nil
 }
 
