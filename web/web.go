@@ -37,7 +37,7 @@ func InitSQLDB() {
 		if err != nil {
 			fmt.Printf("Connect database error: %s\n", err.Error())
 		}
-		db.SQLDB.RegisterModel(&models.DataServer{}, &models.Bucket{}, &models.Content{}, &models.Owner{}, &models.GroupServer{})
+		db.SQLDB.RegisterModel(&models.DataServer{}, &models.Bucket{}, &models.Content{}, &models.Owner{}, &models.GroupServer{}, &models.Object{}, &models.ObjectMeta{}, &models.Fragment{})
 	}
 }
 
