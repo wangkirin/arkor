@@ -18,7 +18,7 @@ import (
 func GetDataGroups() ([]models.Group, error) {
 	var DataGroups []models.Group
 	// Read object server configs
-	if err := setting.InitObjectServerConf("../conf/objectserver.yaml"); err != nil {
+	if err := setting.InitObjectServerConf("conf/objectserver.yaml"); err != nil {
 		log.Errorf("Read config error: %v", err.Error())
 		return nil, err
 	}

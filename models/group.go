@@ -4,8 +4,8 @@ import "time"
 
 // status of a Group
 const (
-	GROUP_STATUS_NORMAL   = 1
-	GROUP_STATUS_UNNORMAL = 2
+	GROUP_STATUS_NORMAL   = 0
+	GROUP_STATUS_UNNORMAL = 1
 )
 
 type Group struct {

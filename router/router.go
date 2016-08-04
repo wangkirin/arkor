@@ -16,6 +16,7 @@ func SetRouters(m *macaron.Macaron) {
 		m.Head("/:bucket", handler.HeadBucketHandler)
 		m.Delete("/:bucket", handler.DeleteBucketHandler)
 		m.Get("/:bucket", handler.GetBucketHandler)
+		m.Put("/:bucket/:object", handler.PutObjectHandler)
 	})
 	// internal APIS
 	m.Group("/internal", func() {

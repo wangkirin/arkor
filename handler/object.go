@@ -1,8 +1,6 @@
 package handler
 
 import (
-	// "encoding/json"
-	// "fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,7 +10,7 @@ import (
 
 	"github.com/containerops/arkor/models"
 	"github.com/containerops/arkor/modules"
-	// "github.com/containerops/arkor/utils/db"
+	"github.com/containerops/arkor/utils/db"
 	// "github.com/containerops/arkor/utils/db/mysql"
 )
 
@@ -21,7 +19,11 @@ const (
 )
 
 func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
-	// Recive ObjectLength
+	// Recive Object Parameters
+	objectName := ctx.Params(":object")
+	objectMetadata := models.ObjectMeta{
+		Key: objectName,
+	}
 	objectLengthStr := ctx.Req.Header.Get("Content-Length")
 	objectLength, err := strconv.ParseInt(objectLengthStr, 10, 64)
 	if err != nil {
@@ -36,11 +38,17 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	fragSize := FRAGEMENT_SIZE_MB * 1024 * 1024
 	fragCount := int64(objectLength / int64(fragSize))
 	partial := int64(objectLength % int64(fragSize))
-	fragements := []models.Fragment{}
 
+	log.Infoln(fragSize)
+	log.Infoln(fragCount)
+	log.Infoln(partial)
+
+	fileIDs := ""
 	// The object divided into one fragment
 	if fragCount == 0 && partial != 0 {
+		log.Infoln("enter partial")
 		content, err := ctx.Req.Body().Bytes()
+		log.Infoln(content)
 		if err != nil {
 			log.Errorf("[Upload Object Error] Can't NOT Get Object Content")
 			return http.StatusBadRequest, []byte("Can't NOT Get Object Content")
@@ -56,7 +64,10 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
 		fragmentInfo.ModTime = time.Now()
-		fragements = append(fragements, fragmentInfo)
+		fileIDs = fileIDs + fragmentInfo.FileID + ";"
+		if err := db.SQLDB.Create(&fragmentInfo); err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
 	}
 
 	// The object divided into more than one fragment and have partial left
@@ -80,7 +91,10 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 			if err := modules.Upload(buf, &fragmentInfo); err != nil {
 				return http.StatusInternalServerError, []byte(err.Error())
 			}
-			fragements = append(fragements, fragmentInfo)
+			fileIDs = fileIDs + fragmentInfo.FileID + ";"
+			if err := db.SQLDB.Create(&fragmentInfo); err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
 		}
 		// Read and Upload partial data
 		fragmentInfo := models.Fragment{
@@ -100,7 +114,10 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 		if err := modules.Upload(buf, &fragmentInfo); err != nil {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
-		fragements = append(fragements, fragmentInfo)
+		fileIDs = fileIDs + fragmentInfo.FileID + ";"
+		if err := db.SQLDB.Create(&fragmentInfo); err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
 	}
 
 	// The object divided into more than one fragment and have no partial left
@@ -129,10 +146,22 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 			if err := modules.Upload(buf, &fragmentInfo); err != nil {
 				return http.StatusInternalServerError, []byte(err.Error())
 			}
-			fragements = append(fragements, fragmentInfo)
+			fileIDs = fileIDs + fragmentInfo.FileID + ";"
+			if err := db.SQLDB.Create(&fragmentInfo); err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
 		}
 	}
 
+	objectMetadata.FileIDs = fileIDs
+	if err := db.SQLDB.Create(&objectMetadata); err != nil {
+		return http.StatusInternalServerError, []byte(err.Error())
+	}
 	// Return the upload result
 	return http.StatusOK, nil
+}
+
+// Download Object
+func GetObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
+
 }
