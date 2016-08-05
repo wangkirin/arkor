@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -16,7 +17,7 @@ import (
 
 const (
 	HEADERSIZE = 6
-	SUCCESS    = "Success"
+	SUCCESS    = ""
 )
 
 var (
@@ -27,6 +28,7 @@ var (
 )
 
 func Upload(data []byte, fragInfo *models.Fragment) error {
+	log.Infoln("enter Upload")
 	datagroups, err := GetDataGroups()
 	if err != nil {
 		return err
@@ -43,7 +45,7 @@ func Upload(data []byte, fragInfo *models.Fragment) error {
 	h.Write(data)
 	fileID := hex.EncodeToString(h.Sum(nil))
 
-	fragInfo.FileID = fileID
+	fragInfo.ID = fileID
 	fragInfo.GroupID = datagroup.ID
 
 	if err := UploadData(data, datagroup, fragInfo); err != nil {
@@ -53,6 +55,7 @@ func Upload(data []byte, fragInfo *models.Fragment) error {
 }
 
 func UploadData(data []byte, datagroup *models.Group, fragInfo *models.Fragment) error {
+	log.Infoln("enter UploadData")
 	// Count the number of normal servers
 	normalCount := 0
 	for _, server := range datagroup.Servers {
@@ -64,7 +67,7 @@ func UploadData(data []byte, datagroup *models.Group, fragInfo *models.Fragment)
 	ch := make(chan string, normalCount)
 	for _, server := range datagroup.Servers {
 		if server.Status == models.RW_STATUS {
-			go concurrenceUpload(server, data, ch, fragInfo.FileID)
+			go concurrenceUpload(server, data, ch, fragInfo.ID)
 		}
 	}
 
@@ -77,13 +80,14 @@ func UploadData(data []byte, datagroup *models.Group, fragInfo *models.Fragment)
 }
 
 func concurrenceUpload(server models.DataServer, data []byte, c chan string, fileId string) {
+	log.Infoln("enter concurrencUpload")
 	connPools := pools.ConnectionPools
 	if connPools == nil {
 		log.Errorf("connectionPools is nil")
 		c <- "connectionPools is nil"
 		return
 	}
-
+	log.Infoln(server)
 	conn, err := connPools.GetConn(&server)
 	if err != nil {
 		log.Errorf("Can not get connection: %s", err.Error())
@@ -107,36 +111,49 @@ func concurrenceUpload(server models.DataServer, data []byte, c chan string, fil
 }
 
 func PutData(data []byte, conn *pools.PooledConn, fileId string, groupID string) error {
+	log.Infoln("enter PutData")
+	log.Infoln(conn)
+	log.Infoln(fileId)
+	log.Infoln(groupID)
 	output := new(bytes.Buffer)
 	header := make([]byte, HEADERSIZE)
+	groupIDnum, _ := strconv.Atoi(groupID)
+	fileIDint, err := FragIDStr2Int(fileId)
+	if err != nil {
+		return nil
+	}
 
 	binary.Write(output, binary.BigEndian, PUT)
 	binary.Write(output, binary.BigEndian, uint32(len(data)+2+8))
-	binary.Write(output, binary.BigEndian, groupID)
-	binary.Write(output, binary.BigEndian, fileId)
+	binary.Write(output, binary.BigEndian, uint16(groupIDnum))
+	binary.Write(output, binary.BigEndian, uint64(fileIDint))
 
 	output.Write(data)
-	_, err := conn.Write(output.Bytes())
+	log.Println("=====data======")
+	log.Println(output.Bytes())
+	_, err = conn.Write(output.Bytes())
 	if err != nil {
 		log.Errorf("write conn error: %s", err)
 		return err
 	}
-
+	log.Println("============")
 	if _, err := io.ReadFull(conn.Br, header); err != nil {
 		log.Errorf("read header error: %s", err)
 		return err
 	}
-
+	log.Println("header")
+	log.Println(header)
 	if header[0] == PUT && header[1] == 0 {
 		log.Debugf("upload success")
 		return nil
 	}
 
-	log.Errorf("fileId: %d, upload failed, header[0] = %d, header[1] = %d", fileId, header[0], header[1])
+	log.Errorf("fileId: %s, upload failed, header[0] = %d, header[1] = %d", fileId, header[0], header[1])
 	return fmt.Errorf("upload error, code: %d", header[1])
 }
 
 func handleUploadResult(ch chan string, size int) error {
+	log.Infoln("enter handleUploadResult")
 	var result, tempResult string
 	var failed = false
 

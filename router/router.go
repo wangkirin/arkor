@@ -29,6 +29,7 @@ func SetRouters(m *macaron.Macaron) {
 			m.Get("/groups/:group", inner.GetGroupHandler)
 			m.Get("/object/id", inner.AllocateFileID)
 			m.Put("/object/info", inner.PutObjectInfoHandler)
+			m.Post("/object/info", inner.PutObjectInfoHandler)
 			m.Get("/object/:object", inner.GetObjectInfoHandler)
 		})
 	})

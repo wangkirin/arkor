@@ -29,5 +29,5 @@ type Object struct {
 
 type FragIDConvert struct {
 	FragIDstr string `json:"fragIDstr" gorm:"unique"`
-	FragIDint int64  `json:"fragIDstr" gorm:"AUTO_INCREMENT"`
+	FragIDint int64  `json:"fragIDstr" gorm:"primary_key;AUTO_INCREMENT"`
 }

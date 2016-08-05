@@ -11,15 +11,13 @@ import (
 
 	"github.com/containerops/arkor/models"
 	"github.com/containerops/arkor/setting"
-	// "github.com/containerops/arkor/utils/db"
-	// "github.com/containerops/arkor/utils/db/mysql"
 )
 
 func GetDataGroups() ([]models.Group, error) {
 	var DataGroups []models.Group
 	// Read object server configs
 	if err := setting.InitObjectServerConf("conf/objectserver.yaml"); err != nil {
-		log.Errorf("Read config error: %v", err.Error())
+		log.Warningf("Read config error: %v", err.Error())
 		return nil, err
 	}
 	// Get DataGroups Information from Registration Center
@@ -66,4 +64,18 @@ func SelectDataGroup(groups []models.Group, size int64) (*models.Group, error) {
 	}
 	randindex := rand.Int() % len(indexlist)
 	return &groups[indexlist[randindex]], nil
+}
+
+func GetServersByGroupID(groupID string) ([]models.DataServer, error) {
+	var dataservers []models.DataServer
+	groups, err := GetDataGroups()
+	if err != nil {
+		return nil, err
+	}
+	for _, group := range groups {
+		if group.ID == groupID {
+			dataservers = group.Servers
+		}
+	}
+	return dataservers, nil
 }
