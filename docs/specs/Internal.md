@@ -535,9 +535,9 @@ Date: date
 
 ```json
 {
-  "objectID": "b06bd",
-  "objectKey": "test.tar",
-  "md5Key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
+  "object_id": "b06bd",
+  "object_key": "test.tar",
+  "md5_key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
   "fragments": [
     {
       "index": 0,
@@ -564,9 +564,9 @@ Date: date
 
 |Name|Type|Description|
 |----|----|-----------|
-|`objectID`|String|ID of the object|
-|`objectKey`|String|Key(name) of the object|
-|`md5key`|String|MD5 value of the object key|
+|`object_id`|String|ID of the object|
+|`object_key`|String|Key(name) of the object|
+|`md5_key`|String|MD5 value of the object key|
 |`fragments`|container|Fragements info of the object|
 |`index`|Int|The sequence number of the fragment|
 |`start`|Int64|Where this fragement range starts|
@@ -618,9 +618,9 @@ Date: date
 ```
 ```json
 {
-  "objectID": "b06bd",
-  "objectKey": "test.tar",
-  "md5Key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
+  "object_id": "b06bd",
+  "object_key": "test.tar",
+  "md5_key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
   "fragments": [
     {
       "index": 0,
@@ -647,9 +647,9 @@ Date: date
 
 |Name|Type|Description|
 |----|----|-----------|
-|`objectID`|String|ID of the object|
-|`objectKey`|String|Key(name) of the object|
-|`md5key`|String|MD5 value of the object key|
+|`object_id`|String|ID of the object|
+|`object_key`|String|Key(name) of the object|
+|`md5_key`|String|MD5 value of the object key|
 |`fragments`|container|Fragements info of the object|
 |`index`|Int|The sequence number of the fragment|
 |`start`|Int64|Where this fragement range starts|
