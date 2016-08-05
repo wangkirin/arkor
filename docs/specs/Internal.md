@@ -10,7 +10,7 @@
 |DELETE|`/internal/v1/:dataserver`|Administrator|Data Server|Delete a data server|
 |GET|`/internal/v1/:dataserver`|Administrator|Data Server|Get data server info by a given data server ID|
 |PUT|`/internal/v1/dataserver`|Data Groups|Data Server|Recieve status from data server|
-|GET|`/internal/v1/groups/:group`|Object Server|Group|Get group info by a given groupID |
+|GET|`/internal/v1/groups/:group`|Object Server|Group|Get group info by a given group_id |
 |GET|`/internal/v1/groups`|Object Server|Group|Get all available groups for Object Server|
 |GET|`/internal/v1/object/id`|Object Server|Object|Returns a FileID allocated by Registration Center|
 |PUT|`/internal/v1/object`|Object Server|Object|Save/Update object info|
@@ -47,7 +47,7 @@ Content-Type: application/json
 
 |Name|Type|Description|
 |----|----|-----------|
-|`groupID`|String|Identifier of the group|
+|`group_id`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on |
 
@@ -63,14 +63,14 @@ Content-Type: application/json
 ```json
 [
   {
-    "dataServerID":"as89ik",
-    "groupID": 1,
+    "data_server_id":"as89ik",
+    "group_id": 1,
     "ip": "10.1.0.6",
     "port": 7654
   },
   {
-    "dataServerID":"zd32hg",
-    "groupID": 2,
+    "data_server_id":"zd32hg",
+    "group_id": 2,
     "ip": "10.1.0.8",
     "port": 7664
   }
@@ -81,8 +81,8 @@ Content-Type: application/json
 
 |Name|Type|Description|
 |----|----|-----------|
-|`dataServerID`|String|Unique ID assigned by registration center|
-|`groupID`|String|Same value with Request|
+|`data_server_id`|String|Unique ID assigned by registration center|
+|`group_id`|String|Same value with Request|
 |`ip`|String|Same value with Request|
 |`port`|Int|Same value with Request|
 
@@ -121,11 +121,11 @@ Date: date
 #### Response On Failure
 
 * 400 - Bad Request (Invalid Parameters)
-* 404 - Not Found (Data server have NOT registered)
+* 404 - Not Found (Data server is NOT registered)
 * 409 - Conflict (Data Server already deleted)
 * 500 - Internal Server Error
 
-### GET  /internal/v1/:dataserverID
+### GET  /internal/v1/:data_server_id
 
 Get data server info by a given data server ID
 #### Request 
@@ -152,8 +152,8 @@ Content-Type: application/json
 ```
 ```json
 {
-  "dataServerID": "as89ik",
-  "groupID": 1,
+  "data_server_id": "as89ik",
+  "group_id": 1,
   "ip": "10.1.0.6",
   "port": 7654,
   "status": 2,
@@ -174,8 +174,8 @@ Content-Type: application/json
 
 |Name|Type|Description|
 |----|----|-----------|
-|`dataServerID`|String|The same with request|
-|`groupID`|String|Identifier of the group|
+|`data_server_id`|String|The same with request|
+|`group_id`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, must be one of: **INIT_STATUS(0)**, **RW_STATUS(1)**, **RO_STATUS(2)** or **ERR_STATUS(3)**|
@@ -194,7 +194,7 @@ Content-Type: application/json
 #### Response On Failure
 
 * 400 - Bad Request (Invalid Parameters)
-* 404 - Not Found (Data server have NOT registered)
+* 404 - Not Found (Data server is NOT registered)
 * 409 - Conflict (Data Server already deleted)
 * 500 - Internal Server Error
 
@@ -214,7 +214,7 @@ Date: date
 
 ```json
 {
-  "groupID": 1,
+  "group_id": 1,
   "ip": "10.1.0.6",
   "port": 7654,
   "status": 2,
@@ -232,7 +232,7 @@ Date: date
 
 |Name|Type|Description|
 |----|----|-----------|
-|`groupID`|String|Identifier of the group|
+|`group_id`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, including: **INIT_STATUS:0**, **RW_STATUS:1**, **RO_STATUS:2**, **ERR_STATUS:3**|
@@ -255,7 +255,7 @@ Date: date
 #### Response On Failure
 
 * 400 - Bad Request (Invalid Parameters)
-* 404 - Not Found (Data server have NOT registered)
+* 404 - Not Found (Data server is NOT registered)
 * 409 - Conflict (Data Server already deleted)
 * 500 - Internal Server Error
 
@@ -263,7 +263,7 @@ Date: date
 
 ### GET  /internal/v1/groups/:group
 
-Get group info by a given groupID
+Get group info by a given group_id
 
 #### Request 
 
@@ -290,11 +290,11 @@ Content-Type: application/json
 ```json
 {
   "id": "1",
-  "groupStatus": "0",
+  "group_status": "0",
   "servers": [
     {
-      "dataServerID": "as89ik",
-      "groupID": 1,
+      "data_server_id": "as89ik",
+      "group_id": 1,
       "ip": "10.1.0.6",
       "port": 7654,
       "status": 2,
@@ -308,8 +308,8 @@ Content-Type: application/json
       "update_time": "2016-07-04 16:09:38"
     },
     {
-      "dataServerID": "zd32hg",
-      "groupID": 1,
+      "data_server_id": "zd32hg",
+      "group_id": 1,
       "ip": "10.1.0.8",
       "port": 7654,
       "status": 2,
@@ -333,8 +333,8 @@ Content-Type: application/json
 |----|----|-----------|
 |`id`|string|ID of the group|
 |`global_status`|Int|Global status of whole group, must be one of: **GROUP_STATUS_NORMAL(0)**, or **GROUP_STATUS_UNNORMAL(1)**|
-|`dataServerID`|String|The same with request|
-|`groupID`|String|Identifier of the group|
+|`data_server_id`|String|The same with request|
+|`group_id`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, must be one of: **INIT_STATUS(0)**, **RW_STATUS(1)**, **RO_STATUS(2)** or **ERR_STATUS(3)**|
@@ -461,8 +461,8 @@ Content-Type: application/json
 |----|----|-----------|
 |`id`|string|ID of the group|
 |`global_status`|Int|Global status of whole group, must be one of: **GROUP_STATUS_NORMAL(0)**, or **GROUP_STATUS_UNNORMAL(1)**|
-|`dataServerID`|String|The same with request|
-|`groupID`|String|Identifier of the group|
+|`data_server_id`|String|The same with request|
+|`group_id`|String|Identifier of the group|
 |`ip`|String|IP address of data server|
 |`port`|Int|Port of data server listenning on|
 |`status`|Int|Current status of dataserver, must be one of: **INIT_STATUS(0)**, **RW_STATUS(1)**, **RO_STATUS(2)** or **ERR_STATUS(3)**|
@@ -535,15 +535,15 @@ Date: date
 
 ```json
 {
-  "objectID": "b06bd",
-  "objectKey": "test.tar",
-  "md5Key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
+  "object_id": "b06bd",
+  "object_key": "test.tar",
+  "md5_key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
   "fragments": [
     {
       "index": 0,
       "start": 0,
       "end": 4194304,
-      "groupID": 1,
+      "group_id": 1,
       "fileId": 240001,
       "isLast": false,
       "modTime": "0001-01-01T00:00:00Z"
@@ -552,7 +552,7 @@ Date: date
       "index": 1,
       "start": 4194304,
       "end": 8388608,
-      "groupID": 1,
+      "group_id": 1,
       "fileId": 240002,
       "isLast": false,
       "modTime": "0001-01-01T00:00:00Z"
@@ -564,14 +564,14 @@ Date: date
 
 |Name|Type|Description|
 |----|----|-----------|
-|`objectID`|String|ID of the object|
-|`objectKey`|String|Key(name) of the object|
-|`md5key`|String|MD5 value of the object key|
+|`object_id`|String|ID of the object|
+|`object_key`|String|Key(name) of the object|
+|`md5_key`|String|MD5 value of the object key|
 |`fragments`|container|Fragements info of the object|
 |`index`|Int|The sequence number of the fragment|
 |`start`|Int64|Where this fragement range starts|
 |`end`|Int64|Where this fragement range ends|
-|`groupID`|String|Group ID of which the fragment is located|
+|`group_id`|String|Group ID of which the fragment is located|
 |`isLast`|Boolean|If this fragement is the last fragement|
 |`modTime`|Date|Date of modification|
 
@@ -618,15 +618,15 @@ Date: date
 ```
 ```json
 {
-  "objectID": "b06bd",
-  "objectKey": "test.tar",
-  "md5Key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
+  "object_id": "b06bd",
+  "object_key": "test.tar",
+  "md5_key": "f1ddfa66735ab83451b8ec3bf9c0fe46",
   "fragments": [
     {
       "index": 0,
       "start": 0,
       "end": 4194304,
-      "groupID": 1,
+      "group_id": 1,
       "fileId": 240001,
       "isLast": false,
       "modTime": "0001-01-01T00:00:00Z"
@@ -635,7 +635,7 @@ Date: date
       "index": 1,
       "start": 4194304,
       "end": 8388608,
-      "groupID": 1,
+      "group_id": 1,
       "fileId": 240002,
       "isLast": false,
       "modTime": "0001-01-01T00:00:00Z"
@@ -647,14 +647,14 @@ Date: date
 
 |Name|Type|Description|
 |----|----|-----------|
-|`objectID`|String|ID of the object|
-|`objectKey`|String|Key(name) of the object|
-|`md5key`|String|MD5 value of the object key|
+|`object_id`|String|ID of the object|
+|`object_key`|String|Key(name) of the object|
+|`md5_key`|String|MD5 value of the object key|
 |`fragments`|container|Fragements info of the object|
 |`index`|Int|The sequence number of the fragment|
 |`start`|Int64|Where this fragement range starts|
 |`end`|Int64|Where this fragement range ends|
-|`groupID`|String|Group ID of which the fragment is located|
+|`group_id`|String|Group ID of which the fragment is located|
 |`isLast`|Boolean|If this fragement is the last fragement|
 |`modTime`|Date|Date of modification|
 

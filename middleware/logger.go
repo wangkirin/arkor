@@ -27,10 +27,12 @@ func InitLog() {
 func logger(runmode string) macaron.Handler {
 	if strings.EqualFold(runmode, "dev") {
 		return func(ctx *macaron.Context) {
+			// body, _ := ctx.Req.Body().String()
 			Log.WithFields(logrus.Fields{
 				"[Method]":        ctx.Req.Method,
 				"[RequestHeader]": ctx.Req.Header,
 				"[Path]":          ctx.Req.RequestURI,
+				// "[Body]":          body,
 			}).Info("Request Received")
 		}
 	}
