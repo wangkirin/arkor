@@ -27,6 +27,8 @@ func SetRouters(m *macaron.Macaron) {
 			m.Get("/groups", inner.GetGroupsHandler)
 			m.Get("/groups/:group", inner.GetGroupHandler)
 			m.Get("/object/id", inner.AllocateFileID)
+			m.Put("/object/info", inner.PutObjectInfoHandler)
+			m.Get("/object/:object", inner.GetObjectInfoHandler)
 		})
 	})
 	// interface to test whether the arkor is working
