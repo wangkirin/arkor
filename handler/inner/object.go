@@ -28,6 +28,7 @@ func AllocateFileID(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 
 func PutObjectInfoHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	data, _ := ctx.Req.Body().Bytes()
+	fmt.Println("data= %v", data)
 	reqBody := make(map[string]interface{})
 	json.Unmarshal(data, &reqBody)
 	fragments := reqBody["fragments"].([]interface{})
@@ -60,6 +61,7 @@ func PutObjectInfoHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 	insertRelationsSQL := "REPLACE INTO object(object_id, fragment_id) VALUES "
 
 	for index := range fragments {
+		fmt.Println(fragments)
 		f := fragments[index].(map[string]interface{})
 
 		fragmentID := utils.MD5ID()
@@ -70,13 +72,14 @@ func PutObjectInfoHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 		file_id := f["file_id"].(string)
 		is_last := f["is_last"].(bool)
 
-		modTimeStr := f["mod_time"].(string)
-		t, err := time.Parse("2006-01-02T15:04:05Z", modTimeStr)
-		if err != nil {
-			log.Errorln(err.Error())
-			return http.StatusBadRequest, []byte("Invalid Parameters")
-		}
-		mod_time := t.Format("2006-01-02 15:04:05")
+		// modTimeStr := f["mod_time"].(string)
+		// t, err := time.Parse("2006-01-02T15:04:05Z", modTimeStr)
+		// if err != nil {
+		// 	log.Errorln(err.Error())
+		// 	return http.StatusBadRequest, []byte("Invalid Parameters")
+		// }
+		timenow := time.Now()
+		mod_time := timenow.Format("2006-01-02 15:04:05")
 
 		insertFragmentSQL := fmt.Sprintf("(%q,%d,%d,%d,%q,%q,%t,%q),", fragmentID, index, start, end, group_id, file_id, is_last, mod_time)
 		insertFragmentsSQL += insertFragmentSQL
@@ -144,6 +147,9 @@ func GetObjectInfoHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 		fragment["group_id"] = group_id
 		fragment["file_id"] = file_id
 		fragment["is_last"] = is_last
+		if mod_time == "" {
+			mod_time = time.Now().Format("2006-01-02T15:04:05Z07:00")
+		}
 		fragment["mod_time"] = mod_time
 
 		fragments = append(fragments, fragment)

@@ -4,13 +4,13 @@ import "time"
 
 // status of a Group
 const (
-	GROUP_STATUS_NORMAL   = 1
-	GROUP_STATUS_UNNORMAL = 2
+	GROUP_STATUS_NORMAL   = 0
+	GROUP_STATUS_UNNORMAL = 1
 )
 
 type Group struct {
-	ID          string       `json:"group_id,omitempty"`
-	GroupStatus int          `json:"group_status,omitempty"`
+	ID          string       `json:"id"`
+	GroupStatus int          `json:"group_status"`
 	Servers     []DataServer `json:"servers,omitempty"`
 }
 

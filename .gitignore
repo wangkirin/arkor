@@ -27,6 +27,8 @@ arkor
 dataserver/spy_server
 conf/runtime.yaml
 conf/dataserver.yaml
+conf/objectserver.yaml
 
 # IDEs' config folder
 .vscode
+

@@ -6,10 +6,9 @@ import (
 
 // status of Data Server
 const (
-	INIT_STATUS = 0
-	RW_STATUS   = 1
-	RO_STATUS   = 2
-	ERR_STATUS  = 3
+	RW_STATUS  = 0
+	RO_STATUS  = 1
+	ERR_STATUS = 2
 )
 
 // struct of DataServer

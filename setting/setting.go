@@ -3,16 +3,8 @@ package setting
 import (
 	"io/ioutil"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/ghodss/yaml"
 )
-
-func init() {
-	if err := InitConf("conf/global.yaml", "conf/runtime.yaml"); err != nil {
-		log.Errorf("Read config error: %v", err.Error())
-		return
-	}
-}
 
 var (
 	Global  *GlobalConf
