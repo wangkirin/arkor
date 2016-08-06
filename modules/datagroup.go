@@ -10,6 +10,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 
 	"github.com/containerops/arkor/models"
+	"github.com/containerops/arkor/modules/pools"
 	"github.com/containerops/arkor/setting"
 )
 
@@ -35,6 +36,9 @@ func GetDataGroups() ([]models.Group, error) {
 	}
 	err = json.Unmarshal(result, &DataGroups)
 	if err != nil {
+		return nil, err
+	}
+	if err := pools.SyncDataServerConnectionPools(DataGroups); err != nil {
 		return nil, err
 	}
 	return DataGroups, nil
@@ -63,7 +67,8 @@ func SelectDataGroup(groups []models.Group, size int64) (*models.Group, error) {
 		return nil, fmt.Errorf("Can not find an available Data Server Group")
 	}
 	randindex := rand.Int() % len(indexlist)
-	return &groups[indexlist[randindex]], nil
+	outgroup := groups[indexlist[randindex]]
+	return &outgroup, nil
 }
 
 func GetServersByGroupID(groupID string) ([]models.DataServer, error) {

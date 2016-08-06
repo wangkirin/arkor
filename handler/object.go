@@ -23,7 +23,7 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	// Recive Object Parameters
 	objectName := ctx.Params(":object")
 	objectMetadata := models.ObjectMeta{
-		ID:     utils.MD5ID(),
+		ID:     objectName,
 		Key:    objectName,
 		Md5Key: utils.MD5(objectName),
 	}
@@ -41,10 +41,6 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	fragSize := FRAGEMENT_SIZE_MB * 1024 * 1024
 	fragCount := int64(objectLength / int64(fragSize))
 	partial := int64(objectLength % int64(fragSize))
-
-	log.Infoln(fragSize)
-	log.Infoln(fragCount)
-	log.Infoln(partial)
 
 	// The object divided into one fragment
 	if fragCount == 0 && partial != 0 {
@@ -66,6 +62,8 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
 		fragmentInfo.ModTime = time.Now()
+		log.Infoln("fragmentInfo===")
+		log.Infoln(fragmentInfo)
 		objectMetadata.Fragments = append(objectMetadata.Fragments, fragmentInfo)
 	}
 
@@ -153,6 +151,7 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 }
 
 func GetObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
+	log.Infoln("enter get obj handler------")
 	outputBuf := bytes.NewBuffer([]byte{})
 	// Handle Input Para
 	objectName := ctx.Params(":object")
@@ -160,6 +159,8 @@ func GetObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	if err != nil {
 		return http.StatusInternalServerError, []byte(err.Error())
 	}
+	log.Infoln("objectmeta======")
+	log.Println(objectMetadata)
 	// Query All Fragment Info of the object
 	fragmentsInfo := make([]models.Fragment, len(objectMetadata.Fragments))
 	for _, fragment := range objectMetadata.Fragments {
@@ -172,6 +173,8 @@ func GetObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 		if err != nil {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
+		log.Println("outputdata*******")
+		log.Println(string(data))
 		if _, err := outputBuf.Write(data); err != nil {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}

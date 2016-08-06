@@ -22,6 +22,9 @@ func Download(fragmentInfo *models.Fragment) ([]byte, error) {
 		return nil, err
 	}
 	// Chose one available server
+	if len(servers) == 0 {
+		return nil, fmt.Errorf("Can not find available groups")
+	}
 	index := rand.Int() % len(servers)
 	server := servers[index]
 	if server.Status != models.RW_STATUS {
@@ -56,16 +59,19 @@ func DownloadData(fragmentInfo *models.Fragment, conn *pools.PooledConn) ([]byte
 
 	// Temp
 	groupIDnum, _ := strconv.Atoi(fragmentInfo.GroupID)
-	fileIDint, _ := FragIDStr2Int(fragmentInfo.ID)
+	fileIDint, err := FragIDStr2Int(fragmentInfo.FileID)
+	if err != nil {
+		return nil, err
+	}
 	//
 	binary.Write(output, binary.BigEndian, GET)
 	binary.Write(output, binary.BigEndian, uint32(2+8))
 	binary.Write(output, binary.BigEndian, uint16(groupIDnum))
 	binary.Write(output, binary.BigEndian, uint64(fileIDint))
 
-	_, err := conn.Write(output.Bytes())
+	_, err = conn.Write(output.Bytes())
 	if err != nil {
-		fmt.Errorf("write socket error %s\n", err)
+		log.Errorf("write socket error %s\n", err)
 		return nil, err
 	}
 
@@ -82,7 +88,6 @@ func DownloadData(fragmentInfo *models.Fragment, conn *pools.PooledConn) ([]byte
 	bodyLen := binary.BigEndian.Uint32(header[2:])
 	data := make([]byte, bodyLen)
 	log.Debugf("GetData len: %d, %d", bodyLen, len(data))
-
 	if _, err := io.ReadFull(conn.Br, data); err != nil {
 		return nil, fmt.Errorf("read socket error %s", err)
 	}
