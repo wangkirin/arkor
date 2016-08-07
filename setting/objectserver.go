@@ -21,8 +21,12 @@ type RegistrationCenter struct {
 }
 
 func InitObjectServerConf(Path string) error {
+	// If Config already init , return
+	if ObjectServerConf.RegistrationCenter.Address != "" {
+		return nil
+	}
+	// else read related config file
 	conf, err := ioutil.ReadFile(Path)
-
 	if err != nil {
 		return err
 	}
