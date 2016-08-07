@@ -28,6 +28,7 @@ func main() {
 	app.Commands = []cli.Command{
 		cmd.CmdWeb,
 		cmd.CmdDataServer,
+		cmd.CmdAllInOne,
 	}
 
 	app.Flags = append(app.Flags, []cli.Flag{}...)
