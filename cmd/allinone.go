@@ -2,11 +2,14 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
+	"sync"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
@@ -14,7 +17,7 @@ import (
 
 	"github.com/containerops/arkor/models"
 	. "github.com/containerops/arkor/setting"
-	"github.com/containerops/arkor/utils/db"
+	// "github.com/containerops/arkor/utils/db"
 	"github.com/containerops/arkor/web"
 )
 
@@ -37,34 +40,32 @@ var CmdAllInOne = cli.Command{
 	},
 }
 
-var dataservers []*models.DataServer
+var dataservers []models.DataServer
 
 func runAllInOne(c *cli.Context) {
 	log.Println("enter run all in one")
 	m := macaron.New()
 
-	// Start DataServer
 	//Set Macaron Web Middleware And Routers
 	web.SetArkorMacaron(m)
-
-	// go func() {
-	// 	listenaddr := fmt.Sprintf("%s:%d", c.String("address"), c.Int("port"))
-	// 	if err := http.ListenAndServe(listenaddr, m); err != nil {
-	// 		fmt.Printf("start generator http service error: %v", err.Error())
-	// 	}
-	// }()
-
-	log.Println("finish listen address")
 
 	//Init Object Server Config
 	rc := &RegistrationCenter{
 		Address: "127.0.0.1",
 		Port:    c.String("port"),
 	}
-	log.Println("PORT=%v", c.String("port"))
 	ObjectServerConf = &ObjectServer{
 		RegistrationCenter: rc,
 	}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		listenaddr := fmt.Sprintf("%s:%d", c.String("address"), c.Int("port"))
+		if err := http.ListenAndServe(listenaddr, m); err != nil {
+			fmt.Printf("start generator http service error: %v", err.Error())
+		}
+	}()
 
 	// Init & Register Dataservers
 	InitDataServer()
@@ -78,8 +79,8 @@ func runAllInOne(c *cli.Context) {
 
 	//Start Data Servers
 	for _, ds := range dataservers {
-		go func(ds *models.DataServer) {
-			log.Println("Data Server IP:%v , Port:%v", ds.IP, ds.Port)
+		go func(ds models.DataServer) {
+			log.Println("Data Server IP:%s , Port:%s", ds.IP, ds.Port)
 			// Check if errlog folder exsist , if not ,create it
 			datadir := fmt.Sprintf("./data/data_%v_%v", ds.IP, ds.Port)
 			_, err = os.Stat(datadir)
@@ -110,30 +111,27 @@ func runAllInOne(c *cli.Context) {
 				log.Fatalf("Start local DataServer error, error INFO: %v", err)
 			}
 		}(ds)
+		runtime.Gosched()
 	}
-	runtime.Gosched()
-	listenaddr := fmt.Sprintf("%s:%d", c.String("address"), c.Int("port"))
-	if err := http.ListenAndServe(listenaddr, m); err != nil {
-		fmt.Printf("start generator http service error: %v", err.Error())
-	}
+	wg.Wait()
 }
 
 func InitDataServer() {
-	ds1 := &models.DataServer{
+	ds1 := models.DataServer{
 		ID:      "ALLinONEdataserver1",
-		GroupID: "1",
+		GroupID: "2",
 		IP:      "127.0.0.1",
 		Port:    8125,
 	}
-	ds2 := &models.DataServer{
+	ds2 := models.DataServer{
 		ID:      "ALLinONEdataserver2",
-		GroupID: "1",
+		GroupID: "2",
 		IP:      "127.0.0.1",
 		Port:    8126,
 	}
-	ds3 := &models.DataServer{
+	ds3 := models.DataServer{
 		ID:      "ALLinONEdataserver3",
-		GroupID: "1",
+		GroupID: "2",
 		IP:      "127.0.0.1",
 		Port:    8127,
 	}
@@ -141,15 +139,20 @@ func InitDataServer() {
 }
 
 func RegisterDataServer() error {
-	for _, ds := range dataservers {
-		if exist, err := db.SQLDB.Query(ds); !exist && err == nil {
-			if err := db.SQLDB.Create(ds); err != nil {
-				log.Infoln(err.Error())
-				return err
-			}
-		} else if err != nil {
-			return err
-		}
+	// Sent POST Request to Register
+	dataServerJson, _ := json.Marshal(dataservers)
+	log.Println(string(dataServerJson))
+	registerURI := fmt.Sprintf("http://%s:%s/internal/v1/dataserver", ObjectServerConf.RegistrationCenter.Address, ObjectServerConf.RegistrationCenter.Port)
+	body := bytes.NewBuffer([]byte(dataServerJson))
+	resp, err := http.Post(registerURI, "application/json", body)
+	if err != nil {
+		log.Errorln(err.Error())
+		return err
+	}
+	result, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("Register Dataserver Error, Status Code: %d, Info: %s", resp.StatusCode, result)
 	}
 	return nil
 }
