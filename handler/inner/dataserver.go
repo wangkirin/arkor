@@ -55,6 +55,11 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 		return http.StatusBadRequest, []byte("Invalid Parameters or Incorrect json content")
 	}
 
+	checkDataServerFormat := "SELECT COUNT(*) FROM data_server WHERE ip IN (%s) AND port IN (%s) AND group_id IN (%s)"
+	checkIPs := ""
+	checkPorts := ""
+	checkGroupIDs := ""
+
 	insertDataServerSql := "INSERT INTO data_server (id, group_id, ip, port, create_time, update_time) VALUES "
 	insertGroupServerSql := "INSERT INTO group_server (group_id, server_id) VALUES "
 
@@ -70,6 +75,10 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 
 		insertDataServerSql += insertDataServer
 		insertGroupServerSql += insertGroupServer
+
+		checkIPs += fmt.Sprintf("%q,", dataServer.IP)
+		checkPorts += fmt.Sprintf("%d,", dataServer.Port)
+		checkGroupIDs += fmt.Sprintf("%q,", dataServer.GroupID)
 
 		ds := &models.DataServer{
 			ID:         serverID,
@@ -97,6 +106,20 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 	}
 
 	dbInstance := db.SQLDB.GetDB().(*gorm.DB)
+
+	checkIPs = checkIPs[:len(checkIPs)-1]
+	checkPorts = checkPorts[:len(checkPorts)-1]
+	checkGroupIDs = checkGroupIDs[:len(checkGroupIDs)-1]
+	checkExistenceSql := fmt.Sprintf(checkDataServerFormat, checkIPs, checkPorts, checkGroupIDs)
+	var cnt int
+	err := dbInstance.Raw(checkExistenceSql).Row().Scan(&cnt)
+	if err != nil {
+		return http.StatusInternalServerError, []byte("Internal server error")
+	}
+	if cnt > 0 {
+		return http.StatusConflict, []byte("Conflict (Data Server already registered)")
+	}
+
 	// Remove the last ','
 	insertDataServerSql = insertDataServerSql[:len(insertDataServerSql)-1]
 	insertGroupServerSql = insertGroupServerSql[:len(insertGroupServerSql)-1]
