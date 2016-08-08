@@ -15,11 +15,11 @@ type Fragment struct {
 	ID      string    `json:"id" gorm:"column:id;primary_key;unique"`
 	Index   int       `json:"index" gorm:"column:index"`
 	Start   int64     `json:"start"`
-	End     int64     `json:"end,omitempty"`
-	GroupID string    `json:"group_id,omitempty"`
-	FileID  string    `json:"file_id,omitempty"`
-	IsLast  bool      `json:"is_last,omitempty"`
-	ModTime time.Time `json:"mod_time,omitempty"`
+	End     int64     `json:"end"`
+	GroupID string    `json:"group_id"`
+	FileID  string    `json:"file_id"`
+	IsLast  bool      `json:"is_last"`
+	ModTime time.Time `json:"mod_time"`
 }
 
 // Object :The relation of ObjectMeta and Fragment
