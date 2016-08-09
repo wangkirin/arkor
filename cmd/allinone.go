@@ -66,6 +66,7 @@ func runAllInOne(c *cli.Context) {
 			fmt.Printf("start generator http service error: %v", err.Error())
 		}
 	}()
+	runtime.Gosched()
 
 	// Init & Register Dataservers
 	InitDataServer()
