@@ -64,6 +64,8 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 	insertGroupServerSql := "INSERT INTO group_server (group_id, server_id) VALUES "
 
 	resultAry := []interface{}{}
+	dsToCache := []*models.DataServer{}
+
 	for _, dataServer := range dataServers {
 
 		now := time.Now()
@@ -80,6 +82,14 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 		checkPorts += fmt.Sprintf("%d,", dataServer.Port)
 		checkGroupIDs += fmt.Sprintf("%q,", dataServer.GroupID)
 
+		dsObj := make(map[string]interface{})
+		dsObj["ip"] = dataServer.IP
+		dsObj["port"] = dataServer.Port
+		dsObj["group_id"] = dataServer.GroupID
+		dsObj["data_server_id"] = serverID
+
+		resultAry = append(resultAry, dsObj)
+
 		ds := &models.DataServer{
 			ID:         serverID,
 			GroupID:    dataServer.GroupID,
@@ -88,21 +98,8 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 			CreateTime: now,
 			UpdateTime: now,
 		}
-
 		log.Println(ds)
-		// Save dataserver info to K/V Database as cache
-		if err := db.KVDB.Create(ds); err != nil {
-			log.Println(err.Error())
-			return http.StatusInternalServerError, []byte(err.Error())
-		}
-
-		dsObj := make(map[string]interface{})
-		dsObj["ip"] = dataServer.IP
-		dsObj["port"] = dataServer.Port
-		dsObj["group_id"] = dataServer.GroupID
-		dsObj["data_server_id"] = serverID
-
-		resultAry = append(resultAry, dsObj)
+		dsToCache = append(dsToCache, ds)
 	}
 
 	dbInstance := db.SQLDB.GetDB().(*gorm.DB)
@@ -132,6 +129,28 @@ func AddDataserverHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte
 	if result := dbInstance.Exec(insertGroupServerSql); result.Error != nil {
 		log.Println(result.Error)
 		return http.StatusInternalServerError, []byte(result.Error.Error())
+	}
+
+	// Cache the data server info
+	numCached := 0
+	numServers := len(dataServers)
+	cached := make(chan bool)
+	for _, dataServer := range dsToCache {
+		go func() {
+			// Save dataserver info to K/V Database as cache
+			if err := db.KVDB.Create(dataServer); err != nil {
+				log.Println(err.Error())
+				cached <- false
+			}
+			numCached++
+			if numCached >= numServers {
+				cached <- true
+			}
+		}()
+	}
+
+	if <-cached == false {
+		return http.StatusInternalServerError, []byte("Internal server error")
 	}
 
 	ctx.Resp.Header().Set("Content-Type", "application/json")
