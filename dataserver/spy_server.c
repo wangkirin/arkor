@@ -547,7 +547,6 @@ static void spy_handle_write(spy_connection_t *conn)
 
 	fid = spy_mach_read_from_8(buf);
 	buf += 8;
-	printf("fid=%s\n", fid);
 
 	if (server_id != config.server_id) {
 		conn->error = SERVER_ID_MISMATCH;
@@ -756,7 +755,6 @@ static void spy_handle_read(spy_connection_t *conn)
 
 	fid = spy_mach_read_from_8(buf);
 	buf += 8;
-	spy_log(INFO,"fid=%s\n", fid);
 
 	if (server_id != config.server_id) {
 		conn->error = SERVER_ID_MISMATCH;

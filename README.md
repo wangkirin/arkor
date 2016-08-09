@@ -17,7 +17,73 @@ Arkor is an object storage service application with high availability and high p
 	* Dynamic scaled out
 
 ## Quick Start
-	TODO
+### Prerequisites
+ Before you use Arkor, please make sure `golang`, `mysql` and `redis` are installed in your machine. And if you run the **`allinone` mode**, please make sure there are more than **6GB free space** in your machine and **Port `8125`,`8126`,`8127` is NOT Occupied**
+
+### Try it out in `allinone` mode
+
+* **complie and run**
+```bash
+cd github.com/containerops
+git clone https://github.com/containerops/arkor
+cd arkor
+make
+./arkor allinone
+```
+
+* **Upload an object**
+
+```bash
+curl -X PUT -H "Content-Length: SIZE_OF_OBJECT_TO UPLOAD" -d 'OBJECT_CONTENT' "http://ARKOR_ADDRESS:ARKOR_PORT/v1/BUCKET_NAME/OBJECT_NAME"
+```
+e.g  (For now, `BUCKET_NAME` can be any string you like )
+```bash
+curl -X PUT -H "Content-Length:13"  -d 'testcontent1' "http://10.229.40.140:8990/v1/testbucket/test1"
+```
+
+
+* **Download an object**
+```bash
+curl -X GET "http://ARKOR_ADDRESS:ARKOR_PORT/v1/BUCKET_NAME/OBJECT_NAME"
+```
+e.g  (For now, `BUCKET_NAME` can be any string you like )
+
+```bash
+curl -X GET "http://10.229.40.140:8990/v1/testbucket/test1"
+```
+
+
+
+
+#### arkor runtime configuration
+Please add a runtime config file named runtime.yaml under arkor/conf before starting arkor service. Below is a runtime.yaml example:
+
+``` yaml
+run:
+  runMode: dev         # application run mode,must be `dev` or `prod`
+  logPath: log/arkor   # where arkor logs are stored
+http:
+  listenMode: http     # support http and https protocol 
+  httpsCertFile: cert/containerops/containerops.crt   # specify user own https certificate file by this parameter.
+  httpsKeyFile: cert/containerops/containerops.key    # specify user own https key file by this parameter.
+sqldatabase:
+  driver: mysql      
+  username: root    # specify the user to login and access the SQL database
+  password: wang    # specify the password of the user
+  protocol: tcp     # the protocol of connection to the database
+  host: 127.0.0.1   # host address of SQL database
+  port: 3306        # listen port of SQL database
+  schema: arkor     # the database name of arkor used
+kvdatabase:
+  driver: redis              
+  username: root               # specify the user to login and access the K/V database
+  password: containerops       # specify the password of the user
+  protocol: tcp                # the protocol of connection to the database
+  host: 127.0.0.1              # host address of K/V database
+  port: 6379                   # listen port of K/V database
+  partition: 0                 # specify db partition number
+
+```
 
 ## Architecture
 
