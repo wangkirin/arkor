@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jcloudpub/speedy/imageserver/sync2"
+	"github.com/containerops/arkor/modules/sync2"
 )
 
 var (
