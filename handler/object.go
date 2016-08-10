@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"bufio"
 	"bytes"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -36,12 +38,8 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 	if objectLength == 0 {
 		return http.StatusBadRequest, []byte("Object Content is empty")
 	}
-	objectdata, err := ctx.Req.Body().Bytes()
-	if err != nil {
-		return http.StatusBadRequest, []byte("Recieve Object Content error")
-	}
-	// Divide into fragments
 
+	// Divide into fragments
 	fragSize := FRAGEMENT_SIZE_MB * 1024 * 1024
 	fragCount := int64(objectLength / int64(fragSize))
 	partial := int64(objectLength % int64(fragSize))
@@ -55,6 +53,10 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 			End:    partial,
 			IsLast: true,
 		}
+		objectdata, err := ctx.Req.Body().Bytes()
+		if err != nil {
+			return http.StatusBadRequest, []byte("Recieve Object Content error")
+		}
 		if err := modules.Upload(objectdata, &fragmentInfo); err != nil {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
@@ -64,6 +66,8 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 
 	// The object divided into more than one fragment and have partial left
 	if fragCount != 0 && partial != 0 {
+		br := bufio.NewReader(ctx.Req.Body().ReadCloser())
+		buf := make([]byte, fragSize)
 		// Read and Upload all fragments
 		for k := 0; k < int(fragCount); k++ {
 			fragmentInfo := models.Fragment{
@@ -72,21 +76,34 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 				End:    int64((k + 1) * fragSize),
 				IsLast: false,
 			}
-			fragdata := objectdata[int64(k*fragSize):int64((k+1)*fragSize)]
-			if err := modules.Upload(fragdata, &fragmentInfo); err != nil {
+			n, err := io.ReadFull(br, buf)
+			if n != fragSize {
+				return http.StatusInternalServerError, []byte("Streaming read Object content Error")
+			} else if err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
+			// fragdata := objectdata[int64(k*fragSize):int64((k+1)*fragSize)]
+			if err := modules.Upload(buf, &fragmentInfo); err != nil {
 				return http.StatusInternalServerError, []byte(err.Error())
 			}
 			objectMetadata.Fragments = append(objectMetadata.Fragments, fragmentInfo)
 		}
 		// Read and Upload partial data
+		bufPartial := make([]byte, partial)
 		fragmentInfo := models.Fragment{
 			Index:  int(fragCount),
 			Start:  (fragCount) * int64(fragSize),
 			End:    (fragCount)*int64(fragSize) + partial,
 			IsLast: true,
 		}
-		fragdata := objectdata[(fragCount+1)*int64(fragSize) : (fragCount+1)*int64(fragSize)+partial]
-		if err := modules.Upload(fragdata, &fragmentInfo); err != nil {
+		// fragdata := objectdata[(fragCount+1)*int64(fragSize) : (fragCount+1)*int64(fragSize)+partial]
+		n, err := io.ReadFull(br, bufPartial)
+		if n != int(partial) {
+			return http.StatusInternalServerError, []byte("Streaming read Object content Error")
+		} else if err != nil {
+			return http.StatusInternalServerError, []byte(err.Error())
+		}
+		if err := modules.Upload(bufPartial, &fragmentInfo); err != nil {
 			return http.StatusInternalServerError, []byte(err.Error())
 		}
 		objectMetadata.Fragments = append(objectMetadata.Fragments, fragmentInfo)
@@ -94,6 +111,8 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 
 	// The object divided into more than one fragment and have no partial left
 	if fragCount != 0 && partial == 0 {
+		br := bufio.NewReader(ctx.Req.Body().ReadCloser())
+		buf := make([]byte, fragSize)
 		// Read and Upload all fragments
 		for k := 0; k < int(fragCount); k++ {
 			fragmentInfo := models.Fragment{
@@ -106,8 +125,14 @@ func PutObjectHandler(ctx *macaron.Context, log *logrus.Logger) (int, []byte) {
 			} else {
 				fragmentInfo.IsLast = true
 			}
-			fragdata := objectdata[int64(k*fragSize):int64((k+1)*fragSize)]
-			if err := modules.Upload(fragdata, &fragmentInfo); err != nil {
+			n, err := io.ReadFull(br, buf)
+			if n != fragSize {
+				return http.StatusInternalServerError, []byte("Streaming read Object content Error")
+			} else if err != nil {
+				return http.StatusInternalServerError, []byte(err.Error())
+			}
+			// fragdata := objectdata[int64(k*fragSize):int64((k+1)*fragSize)]
+			if err := modules.Upload(buf, &fragmentInfo); err != nil {
 				return http.StatusInternalServerError, []byte(err.Error())
 			}
 			objectMetadata.Fragments = append(objectMetadata.Fragments, fragmentInfo)
