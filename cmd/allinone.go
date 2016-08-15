@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -67,6 +68,16 @@ func runAllInOne(c *cli.Context) {
 		}
 	}()
 	runtime.Gosched()
+	if RunTime.Http.ListenMode == "https" {
+		go func() {
+			listenaddr := fmt.Sprintf("%s:%s", c.String("address"), "443")
+			server := &http.Server{Addr: listenaddr, TLSConfig: &tls.Config{MinVersion: tls.VersionTLS10}, Handler: m}
+			if err := server.ListenAndServeTLS(RunTime.Http.HttpsCertFile, RunTime.Http.HttpsKeyFile); err != nil {
+				fmt.Printf("start generator https service error: %v", err.Error())
+			}
+		}()
+		runtime.Gosched()
+	}
 
 	// Init & Register Dataservers
 	InitDataServer()
@@ -101,7 +112,7 @@ func runAllInOne(c *cli.Context) {
 
 			var stdout, stderr bytes.Buffer
 			cmd := exec.Command(DATASERVER_BINARY_PATH, "--ip", ds.IP, "--port", fmt.Sprintf("%v", ds.Port), "--master_ip", ObjectServerConf.RegistrationCenter.Address,
-				"--master_port", ObjectServerConf.RegistrationCenter.Port, "--chunks", "1",
+				"--master_port", ObjectServerConf.RegistrationCenter.Port, "--chunks", "10",
 				"--group_id", ds.GroupID, "--data_dir", datadir, "--error_log", errlogpath)
 			cmd.Stdout = &stdout
 			cmd.Stderr = &stderr

@@ -16,8 +16,9 @@ type ObjectServer struct {
 }
 
 type RegistrationCenter struct {
-	Address string "yaml:address"
-	Port    string "yaml:port"
+	ListenMode string "yaml:listenMode"
+	Address    string "yaml:address"
+	Port       string "yaml:port"
 }
 
 func InitObjectServerConf(Path string) error {
