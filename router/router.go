@@ -37,3 +37,37 @@ func SetRouters(m *macaron.Macaron) {
 	// interface to test whether the arkor is working
 	m.Get("/ping", handler.Ping)
 }
+
+func SetObjectServerRouters(m *macaron.Macaron) {
+	m.Group("/v1", func() {
+		m.Get("/", handler.GetServiceHandler)
+		m.Put("/:bucket", handler.PutBucketHandler)
+		m.Head("/:bucket", handler.HeadBucketHandler)
+		m.Delete("/:bucket", handler.DeleteBucketHandler)
+		m.Get("/:bucket", handler.GetBucketHandler)
+		m.Put("/:bucket/:object", handler.PutObjectHandler)
+		m.Get("/:bucket/:object", handler.GetObjectHandler)
+	})
+	// interface to test whether the arkor is working
+	m.Get("/ping", handler.Ping)
+}
+
+func SetRegistrationCenterRouters(m *macaron.Macaron) {
+	// internal APIS
+	m.Group("/internal", func() {
+		m.Group("/v1", func() {
+			m.Post("/dataserver" /*binding.Bind(models.DataServer{}),*/, inner.AddDataserverHandler)
+			m.Delete("/:dataserver", inner.DeleteDataserverHandler)
+			m.Get("/:dataserver", inner.GetDataserverHandler)
+			m.Put("/dataserver", binding.Bind(models.DataServer{}), inner.PutDataserverHandler)
+			m.Get("/groups", inner.GetGroupsHandler)
+			m.Get("/groups/:group", inner.GetGroupHandler)
+			m.Get("/object/id", inner.AllocateFileID)
+			m.Put("/object/info", inner.PutObjectInfoHandler)
+			m.Post("/object/info", inner.PutObjectInfoHandler)
+			m.Get("/object/:object", inner.GetObjectInfoHandler)
+		})
+	})
+	// interface to test whether the arkor is working
+	m.Get("/ping", handler.Ping)
+}

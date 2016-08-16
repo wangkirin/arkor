@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
@@ -29,7 +30,7 @@ type DataServer struct {
 	RegistrationCenterIP   string "yaml:registrationCenterIP"
 	RegistrationCenterPort string "yaml:registrationCenterPort"
 	DataDir                string "yaml:dataDir"
-	ErrorLogDir            string "yaml:errorLogDir"
+	ErrorLogPath           string "yaml:errorLogPath"
 	ChunkNum               string "yaml:chunkNum"
 }
 
@@ -51,20 +52,24 @@ func initDataServerConf(Path string) error {
 func runLocalDataServer(c *cli.Context) {
 	// Load Configs
 	if err := initDataServerConf("conf/dataserver.yaml"); err != nil {
-		log.Errorf("Read Data Server config error: %v", err.Error())
+		log.Errorf("Read Data Server config error: %v \n", err.Error())
 		return
 	}
 
 	// Check if chunkserver binary exsist
 	_, err := os.Stat(DATASERVER_BINARY_PATH)
 	if err != nil && os.IsNotExist(err) {
-		log.Fatalln("Cannot find binary file of  DataServer")
+		log.Fatalln("Cannot find binary file of DataServer")
 	}
 
-	// Check if errlog folder exsist , if not ,create it
-	_, err = os.Stat(DataServerConf.ErrorLogDir)
+	// Check if errlog file exsist , if not ,create it
+	_, err = os.Stat(filepath.Dir(DataServerConf.ErrorLogPath))
 	if err != nil || os.IsNotExist(err) {
-		os.MkdirAll(DataServerConf.ErrorLogDir, 0777)
+		os.MkdirAll(filepath.Dir(DataServerConf.ErrorLogPath), 0777)
+	}
+	_, err = os.Stat(DataServerConf.ErrorLogPath)
+	if err != nil || os.IsNotExist(err) {
+		os.Create(DataServerConf.ErrorLogPath)
 	}
 	// Check if data folder exsist , if not ,create it
 	_, err = os.Stat(DataServerConf.DataDir)
@@ -75,13 +80,13 @@ func runLocalDataServer(c *cli.Context) {
 	var stdout, stderr bytes.Buffer
 	cmd := exec.Command(DATASERVER_BINARY_PATH, "--ip", DataServerConf.IP, "--port", DataServerConf.Port, "--master_ip", DataServerConf.RegistrationCenterIP,
 		"--master_port", DataServerConf.RegistrationCenterPort, "--chunks", DataServerConf.ChunkNum,
-		"--group_id", DataServerConf.GroupID, "--data_dir", DataServerConf.DataDir, "--error_log", DataServerConf.ErrorLogDir)
+		"--group_id", DataServerConf.GroupID, "--data_dir", DataServerConf.DataDir, "--error_log", DataServerConf.ErrorLogPath)
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err = cmd.Run()
 	if err != nil {
-		log.Infof("Start local DataServer error, STDOUT: %s", stdout.Bytes())
-		log.Infof("Start local DataServer error, STDERR: %s", stderr.Bytes())
-		log.Fatalf("Start local DataServer error, error INFO: %v", err)
+		log.Infof("Start local DataServer error, STDOUT: %s \n", stdout.Bytes())
+		log.Infof("Start local DataServer error, STDERR: %s \n", stderr.Bytes())
+		log.Fatalf("Start local DataServer error, error INFO: %v \n", err)
 	}
 }

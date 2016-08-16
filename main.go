@@ -27,6 +27,8 @@ func main() {
 
 	app.Commands = []cli.Command{
 		cmd.CmdWeb,
+		cmd.CmdObjectServer,
+		cmd.CmdRegistrationCenter,
 		cmd.CmdDataServer,
 		cmd.CmdAllInOne,
 	}
