@@ -1,12 +1,14 @@
 ---
 run:
   runMode: dev
+  logLevel: warn
   logPath: log/arkor
 http:
   listenMode: http
   httpsCertFile: cert/containerops/containerops.crt
   httpsKeyFile: cert/containerops/containerops.key
 sqldatabase:
+  mode: normal
   driver: mysql
   username: root
   password: wang

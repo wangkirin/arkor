@@ -40,7 +40,7 @@ func (my *mysql) InitDB(driver, user, passwd, uri, name string, partition int64)
 		db.DB().SetMaxIdleConns(10)
 		db.DB().SetMaxOpenConns(100)
 		db.SingularTable(true)
-		if setting.RunTime.Run.RunMode == "dev" {
+		if setting.RunTime.Sqldatabase.Mode == "dev" {
 			db = db.Debug()
 		}
 	}

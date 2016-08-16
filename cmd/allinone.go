@@ -43,7 +43,6 @@ var CmdAllInOne = cli.Command{
 var dataservers []models.DataServer
 
 func runAllInOne(c *cli.Context) {
-	log.Println("enter run all in one")
 	m := macaron.New()
 
 	//Set Macaron Web Middleware And Routers
@@ -81,7 +80,7 @@ func runAllInOne(c *cli.Context) {
 	//Start Data Servers
 	for _, ds := range dataservers {
 		go func(ds models.DataServer) {
-			log.Println("Data Server IP:%s , Port:%s", ds.IP, ds.Port)
+			log.Infof("Data Server IP: %v, Port:%v", ds.IP, ds.Port)
 			// Check if errlog folder exsist , if not ,create it
 			datadir := fmt.Sprintf("./data/data_%v_%v", ds.IP, ds.Port)
 			_, err = os.Stat(datadir)
@@ -142,7 +141,6 @@ func InitDataServer() {
 func RegisterDataServer() error {
 	// Sent POST Request to Register
 	dataServerJson, _ := json.Marshal(dataservers)
-	log.Println(string(dataServerJson))
 	registerURI := fmt.Sprintf("http://%s:%s/internal/v1/dataserver", ObjectServerConf.RegistrationCenter.Address, ObjectServerConf.RegistrationCenter.Port)
 	body := bytes.NewBuffer([]byte(dataServerJson))
 	resp, err := http.Post(registerURI, "application/json", body)

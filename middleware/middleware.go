@@ -7,8 +7,8 @@ import (
 )
 
 func SetMiddlewares(m *macaron.Macaron) {
-	// init log settings
-	InitLog()
+	// Set Log level
+	Initlog(setting.RunTime.Run.LogLevel)
 	//Set global Logger
 	m.Map(Log)
 	//Set logger handler function, deal with all the Request log output

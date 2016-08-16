@@ -28,11 +28,13 @@ type RunTimeConf struct {
 }
 
 type Run struct {
-	RunMode string
-	LogPath string
+	RunMode  string
+	LogLevel string
+	LogPath  string
 }
 
 type Sqldatabase struct {
+	Mode     string
 	Driver   string
 	Username string
 	Password string

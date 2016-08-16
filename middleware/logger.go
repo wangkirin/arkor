@@ -3,6 +3,7 @@ package middleware
 import (
 	"runtime"
 	"strings"
+	"time"
 
 	"github.com/Sirupsen/logrus"
 	"gopkg.in/macaron.v1"
@@ -10,30 +11,29 @@ import (
 
 var Log = logrus.New()
 
-func InitLog() {
-	// save log content to file, Not enable yet
-
-	// // write logs to local file
-	// f, err := os.OpenFile("log/arkor.log", os.O_WRONLY|os.O_CREATE, 0755)
-	// if err != nil {
-	// 	fmt.Errorf("Init logger middleware FAIL: %s", err.Error())
-	// }
-	// logrus.SetOutput(f)
-
-	// // set Output format
-	// logrus.SetFormatter(&logrus.JSONFormatter{})
+func Initlog(loglevel string) {
+	switch loglevel {
+	case "info":
+		logrus.SetLevel(logrus.InfoLevel)
+	case "warn":
+		logrus.SetLevel(logrus.WarnLevel)
+	case "error":
+		logrus.SetLevel(logrus.ErrorLevel)
+	case "fatal":
+		logrus.SetLevel(logrus.FatalLevel)
+	default:
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 }
 
 func logger(runmode string) macaron.Handler {
 	if strings.EqualFold(runmode, "dev") {
 		return func(ctx *macaron.Context) {
-			// body, _ := ctx.Req.Body().String()
-			Log.WithFields(logrus.Fields{
+			logrus.WithFields(logrus.Fields{
 				"[Method]":        ctx.Req.Method,
-				"[RequestHeader]": ctx.Req.Header,
-				"[Path]":          ctx.Req.RequestURI,
-				// "[Body]":          body,
-			}).Info("Request Received")
+				"[RequestSource]": ctx.RemoteAddr(),
+				"[Time]":          time.Now().Format("2006-01-02 15:04:05"),
+			}).Info(ctx.Req.RequestURI)
 		}
 	}
 	return nil
