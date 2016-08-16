@@ -4,5 +4,5 @@ port: 9632
 registrationCenterIP: 10.229.40.140
 registrationCenterPort: 8990
 dataDir: /root/arkor/data
-errorLogDir: /root/arkor/errlog/err.log
+errorLogPath: /root/arkor/errlog/err.log
 chunkNum: 2

@@ -28,6 +28,36 @@ func SetArkorMacaron(m *macaron.Macaron) {
 
 }
 
+func SetObjectServerMacaron(m *macaron.Macaron) {
+	// Setting Middleware
+	middleware.SetMiddlewares(m)
+	// Setting Router
+	router.SetObjectServerRouters(m)
+	// Static
+	if RunTime.Run.RunMode == "dev" {
+		m.Use(macaron.Static("external"))
+	}
+	// Init SQL DB
+	InitSQLDB()
+	// Init Key/Value DB
+	InitKVDB()
+}
+
+func SetRegistrationCenterMacaron(m *macaron.Macaron) {
+	// Setting Middleware
+	middleware.SetMiddlewares(m)
+	// Setting Router
+	router.SetRegistrationCenterRouters(m)
+	// Static
+	if RunTime.Run.RunMode == "dev" {
+		m.Use(macaron.Static("external"))
+	}
+	// Init SQL DB
+	InitSQLDB()
+	// Init Key/Value DB
+	InitKVDB()
+}
+
 func InitSQLDB() {
 	if err := db.SelectSQLDriver(RunTime.Sqldatabase.Driver); err != nil {
 		fmt.Printf("Register database driver error: %s\n", err.Error())
